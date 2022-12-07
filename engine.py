@@ -45,6 +45,34 @@ def charToUni(c):
     if c == 'k':
         return u'\N{BLACK CHESS KING}'
 
+def pieceToScore(c):
+    if c == 'P':  # caps are white
+        return 1
+    if c == 'R':
+        return 5
+    if c == 'N':
+        return 3
+    if c == 'B':
+        return 3
+    if c == 'Q':
+        return 9
+    if c == 'K':
+        return 100
+    if c == 'p':  # lowercase is black
+        return -1
+    if c == 'r':
+        return -5
+    if c == 'n':
+        return -3
+    if c == 'b':
+        return -3
+    if c == 'q':
+        return -9
+    if c == 'k':
+        return -100
+    print("c: ", c)
+    return 1000
+
 def printfen(fen):
     rows = fen.split('/')
     j = 0
@@ -64,12 +92,6 @@ def printfen(fen):
 
 def mainTerminal():
 
-    my_file = open("my_file.txt", "w")
-    my_file.write(f'timeeex: {time.time()} \n')
-    my_file.write("wrote input?")
-    sys.stdout.write("in mainTerminal\n")
-    sys.stdout.flush()
-
     board = chess.Board()
 
     boardfen = board.fen().split(' ', 1)[0]
@@ -80,13 +102,6 @@ def mainTerminal():
     while not board.is_game_over():
         try:
             INPUT = input("Move:\n")
-
-            my_file.write("INput from xboard: ")
-            my_file.write(INPUT)
-            sys.stdout.write("input FFrom xboadD\n")
-            sys.stdout.write(INPUT)
-            sys.stdout.flush()
-            print("Input from xboard: ", INPUT)
 
             move = chess.Move.from_uci(INPUT)
             while move not in board.legal_moves:
@@ -99,34 +114,28 @@ def mainTerminal():
             if board.is_game_over():
                 continue
 
-            moves = board.generate_legal_moves()
-            numlegal = board.legal_moves.count()
-            num = np.random.randint(numlegal)
-            i = 0
-            for move in moves:
-                if i == num:
-                    damove = move
-                    break
-                i += 1
+            # black should want a very negative score, white a very positive score
+
+            _, damove = moveSearchMax(board, 5, float("-inf"), float("inf"))
+
+            print("Opponent's move: ", damove)
+
             board.push(damove)
+
             boardfen = board.fen().split(' ', 1)[0]
 
             printfen(boardfen)
             #print("------------------")
         except Exception as ex:
             print("oopss, ", ex)
-            my_file.write("exception")
 
     boardfen = board.fen().split(' ', 1)[0]
     printfen(boardfen)
     if board.outcome().winner:
         print("White wins")
-        my_file.write("White wins")
     else:
         print("Black wins")
-        my_file.write("Black wins")
 
-    my_file.close()
 
 def setup():
     board = chess.Board()
@@ -166,22 +175,23 @@ def processInput(my_file, board, boardfen):
 
         if INPUT == "":
             break
-        inArray = INPUT.rsplit()
+        #inArray = INPUT.rsplit()
         try:
             move = chess.Move.from_uci(INPUT)
+
             board.push(move)
 
-            moves = board.generate_legal_moves()
-            numlegal = board.legal_moves.count()
-            num = np.random.randint(numlegal)
-            i = 0
-            for move in moves:
-                if i == num:
-                    damove = move
-                    break
-                i += 1
+            if board.is_game_over():
+                continue
+
+            # black should want a very negative score, white a very positive score
+
+            _, damove = moveSearchMax(board, 5, float("-inf"), float("inf"))
+
+            print("da", damove)
+
             board.push(damove)
-            #time.sleep(1)
+
             sys.stdout.write("move " + damove.uci() + "\n")
             sys.stdout.flush()
         except Exception as ex:
@@ -190,8 +200,97 @@ def processInput(my_file, board, boardfen):
             sys.stdout.flush()
     return
 
-def eval(board):
+# board is the current board, depth is the number of levels yet to recurse
+def moveSearchMax(board, depth, lowest, highest):
+    print("depthmax: ", depth)
+    if depth == 0:
+        return evalPos(board), None
+    moves = board.legal_moves
+    minEval = float("-inf")
+    lo = lowest
+    hi = highest
+    bestMove = None
 
+    for i, move in enumerate(moves):
+
+        print("moveMax ", move, "color: ", board.turn)
+        board.push(move)
+        if board.is_game_over():
+            print("BOARD GAME OVER")
+            evaluation = evalPos(board)
+            bestMove = move
+            board.pop()
+            return evaluation, bestMove
+
+        evaluation, _ = moveSearchMin(board, depth - 1, lo, hi)
+        board.pop()
+
+        print("minEvaluation: ", evaluation)
+        print("minEval: ", minEval)
+        if evaluation > minEval:
+            minEval = evaluation
+            bestMove = move
+
+        if minEval >= hi:
+            return minEval, bestMove
+        lo = max(lo, minEval)
+
+    return minEval, bestMove
+
+def moveSearchMin(board, depth, lowest, highest):
+    print("depthmin: ", depth)
+    if depth == 0:
+        return evalPos(board), None
+    moves = board.legal_moves
+    maxEval = float("inf")
+    lo = lowest
+    hi = highest
+    bestMove = None
+
+    for i, move in enumerate(moves):
+        print("moveMin: ", move, "color: ", board.turn)
+        board.push(move)
+        if board.is_game_over():
+            evaluation = evalPos(board)
+            bestMove = move
+            board.pop()
+            return evaluation, bestMove
+
+        evaluation, _ = moveSearchMax(board, depth - 1, lo, hi)
+        board.pop()
+        print("maxEvaluation: ", evaluation)
+        print("maxEval: ", maxEval)
+        if maxEval > evaluation:
+            maxEval = evaluation
+            bestMove = move
+
+        if maxEval <= lo:
+            return maxEval, move
+        hi = min(hi, maxEval)
+
+    return maxEval, bestMove
+
+
+def evalPos(board):
+    #white is going, so board.turn=False
+    evaluation = 0
+
+    if board.is_checkmate():
+        evaluation += 1000
+
+    if board.turn:  # if black is going (so now it is white's "turn"), invert check scores
+        evaluation *= -1
+
+
+    fen = board.fen()
+    for c in fen.split(" ")[0]:
+        if c.isalpha():
+            sc = pieceToScore(c)
+            evaluation += sc
+
+    print("EVAL: ", evaluation)
+
+    return evaluation * -1
 
 
 
