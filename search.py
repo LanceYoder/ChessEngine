@@ -2,7 +2,7 @@ from eval import *
 
 # board is the current board, depth is the number of levels yet to recurse
 def moveSearchMax(board, depth, lowest, highest):
-    print("depthmax: ", depth)
+    # print("depthmax: ", depth)
     if depth == 0:
         return evalPos(board), None
     moves = board.legal_moves
@@ -13,10 +13,10 @@ def moveSearchMax(board, depth, lowest, highest):
 
     for i, move in enumerate(moves):
 
-        print("moveMax ", move, "color: ", board.turn)
+        # print("moveMax ", move, "color: ", board.turn)
         board.push(move)
         if board.is_game_over():
-            print("BOARD GAME OVER")
+            # print("BOARD.GAME_OVER")
             evaluation = evalPos(board)
             bestMove = move
             board.pop()
@@ -25,8 +25,8 @@ def moveSearchMax(board, depth, lowest, highest):
         evaluation, _ = moveSearchMin(board, depth - 1, lo, hi)
         board.pop()
 
-        print("minEvaluation: ", evaluation)
-        print("minEval: ", minEval)
+        # print("minEvaluation: ", evaluation)
+        # print("minEval: ", minEval)
         if evaluation > minEval:
             minEval = evaluation
             bestMove = move
@@ -38,7 +38,7 @@ def moveSearchMax(board, depth, lowest, highest):
     return minEval, bestMove
 
 def moveSearchMin(board, depth, lowest, highest):
-    print("depthmin: ", depth)
+    # print("depthmin: ", depth)
     if depth == 0:
         return evalPos(board), None
     moves = board.legal_moves
@@ -48,7 +48,7 @@ def moveSearchMin(board, depth, lowest, highest):
     bestMove = None
 
     for i, move in enumerate(moves):
-        print("moveMin: ", move, "color: ", board.turn)
+        # print("moveMin: ", move, "color: ", board.turn)
         board.push(move)
         if board.is_game_over():
             evaluation = evalPos(board)
@@ -58,8 +58,8 @@ def moveSearchMin(board, depth, lowest, highest):
 
         evaluation, _ = moveSearchMax(board, depth - 1, lo, hi)
         board.pop()
-        print("maxEvaluation: ", evaluation)
-        print("maxEval: ", maxEval)
+        # print("maxEvaluation: ", evaluation)
+        # print("maxEval: ", maxEval)
         if maxEval > evaluation:
             maxEval = evaluation
             bestMove = move

@@ -1,7 +1,7 @@
 import chess
 from conversions import *
 
-def printfen(fen):
+def print_fen(fen):
     rows = fen.split('/')
     j = 0
     for row in rows:
@@ -20,6 +20,6 @@ def printfen(fen):
 def setup():
     board = chess.Board()
 
-    boardfen = board.fen().split(' ', 1)[0]
+    board_fen = board.fen().split(' ', 1)[0]
 
-    return board, boardfen
+    return board, board_fen
