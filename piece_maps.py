@@ -1,18 +1,30 @@
 # all for white
 
-def pms(type, sqr):
-    if type == 'P' or type == 'p':
-        return pawn_pos(sqr)
-    if type == 'N' or type == 'n':
-        return knight_pos(sqr)
-    if type == 'B' or type == 'b':
-        return bishop_pos(sqr)
-    if type == 'R' or type == 'r':
-        return rook_pos(sqr)
-    if type == 'Q' or type == 'q':
-        return queen_pos(sqr)
-    if type == 'K' or type == 'k':
+def pms(piece_type, sqr):
+    if piece_type == 'P':
         return king_pos(sqr)
+    elif piece_type == 'p':
+        return (-1) * pawn_pos(63 - sqr)
+    elif piece_type == 'N':
+        return king_pos(sqr)
+    elif piece_type == 'n':
+        return (-1) * knight_pos(63 - sqr)
+    elif piece_type == 'B':
+        return king_pos(sqr)
+    elif piece_type == 'b':
+        return (-1) * bishop_pos(63 - sqr)
+    elif piece_type == 'R':
+        return king_pos(sqr)
+    elif piece_type == 'r':
+        return (-1) * rook_pos(63 - sqr)
+    elif piece_type == 'Q':
+        return king_pos(sqr)
+    elif piece_type == 'q':
+        return (-1) * queen_pos(63 - sqr)
+    elif piece_type == 'K':
+        return king_pos(sqr)
+    elif piece_type == 'k':
+        return (-1) * king_pos(63 - sqr)
 
 # pawn
 def pawn_pos(sqr):

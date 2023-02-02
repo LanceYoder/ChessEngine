@@ -26,28 +26,28 @@ def charToUni(c):
 
 def pieceToScore(c):
     if c == 'P':  # caps are white
-        return 10
+        return 100
     elif c == 'R':
-        return 50
+        return 500
     elif c == 'N':
-        return 30
+        return 300
     elif c == 'B':
-        return 30
+        return 300
     elif c == 'Q':
-        return 90
+        return 900
     elif c == 'K':
-        return 1000
+        return 10000
     elif c == 'p':  # lowercase is black
-        return -10
+        return -100
     elif c == 'r':
-        return -50
+        return -500
     elif c == 'n':
-        return -30
+        return -300
     elif c == 'b':
-        return -30
+        return -300
     elif c == 'q':
-        return -90
+        return -900
     elif c == 'k':
-        return -1000
+        return -10000
     print("c: ", c)
     return 10000
