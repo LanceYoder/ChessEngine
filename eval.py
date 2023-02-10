@@ -2,7 +2,7 @@ from conversions import *
 from piece_maps import *
 
 def evalPos(board):
-    print("______________________")
+    #print("______________________")
     #white is going, so board.turn=False
     evaluation = 0
 
@@ -18,7 +18,7 @@ def evalPos(board):
     for p in pieces:
         piece_type = str(pieces[p])
         evaluation += pieceToScore(piece_type)
-        print("piecetype: ", piece_type, "square: ", p)
+        #rint("piecetype: ", piece_type, "square: ", p)
         evaluation += pms(piece_type, p)
 
     return evaluation * -1
