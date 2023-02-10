@@ -1,10 +1,11 @@
 from eval import *
+from quiescence import *
 
 # board is the current board, depth is the number of levels yet to recurse
-def moveSearchMax(board, depth, lowest, highest):
+def moveSearchMax(board, depth, lowest, highest):#, quie=False):
     # print("depthmax: ", depth)
     if depth == 0:
-        return evalPos(board), None
+        return evalPos(board), None #moveSearchMin(board, 0, lowest, highest), True), None # add quiescence here
     moves = board.legal_moves
     minEval = float("-inf")
     lo = lowest
@@ -22,7 +23,7 @@ def moveSearchMax(board, depth, lowest, highest):
             board.pop()
             return evaluation, bestMove
 
-        evaluation, _ = moveSearchMin(board, depth - 1, lo, hi)
+        evaluation, _ = moveSearchMin(board, depth - 1, lo, hi)#, quie)
         board.pop()
 
         # print("minEvaluation: ", evaluation)
@@ -40,7 +41,7 @@ def moveSearchMax(board, depth, lowest, highest):
 def moveSearchMin(board, depth, lowest, highest):
     # print("depthmin: ", depth)
     if depth == 0:
-        return evalPos(board), None
+        return evalPos(board), None # add quiescence here
     moves = board.legal_moves
     maxEval = float("inf")
     lo = lowest
