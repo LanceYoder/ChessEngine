@@ -7,8 +7,11 @@
 
 import sys
 import codecs
+from multiprocessing import Manager, Process
+
 from utilities import *
 from search import *
+from stocky import *
 
 #############################
 # weird thing to make it work
@@ -115,61 +118,152 @@ def mainTerminal(board, board_fen, depth):
     else:
         print("Black wins")
 
+def mainStocky(i, returnDict, depth):
+    outcomes = np.array([0.0, 0.0])
+
+    for j in range(4):
+        board, _ = setup()
+        print("Game " + str(j) + " on Thread " + str(i))
+        k = 0
+        while True:
+            print(". Thread " + str(i) + " on Move " + str(k))
+            k += 1
+            move = takeStock(board, board.fen())
+
+            move = chess.Move.from_uci(move)
+
+            board.push(move)
+            #print_fen(board.fen().split(' ', 1)[0])
+            #print("_________________")
+
+            if board.is_game_over():
+                print("IT'S ALL OVER")
+                print(board.outcome().result())
+                if board.outcome().winner is None:
+                    returnDict.append(np.array([0.5, 0.5]))
+                    outcomes += np.array([0.5, 0.5])
+                elif board.outcome().winner:
+                    returnDict.append(np.array([1, 0]))
+                    outcomes += np.array([1, 0])
+                else:
+                    returnDict.append(np.array([0, 1]))
+                    outcomes += np.array([0, 1])
+                print("Game " + str(j) + " on Thread " + str(i) + " DONE")
+                break
+
+            _, move = moveSearchMax(board, depth, float("-inf"), float("inf"))
+
+            # print("Move: ", move)
+
+            board.push(move)
+            #print_fen(board.fen().split(' ', 1)[0])
+            #print("_________________")
+            if board.is_game_over():
+                print("IT'S ALL OVER")
+                print(board.outcome().result())
+                if board.outcome().winner is None:
+                    returnDict.append(np.array([0.5, 0.5]))
+                    outcomes += np.array([0.5, 0.5])
+                elif board.outcome().winner:
+                    returnDict.append(np.array([1, 0]))
+                    outcomes += np.array([1, 0])
+                else:
+                    returnDict.append(np.array([0, 1]))
+                    outcomes += np.array([0, 1])
+                print("Game " + str(j) + " on Thread " + str(i) + " DONE")
+                break
+            #_ = input("press any key to continue")
+        print(str(outcomes[0]) + "-" + str(outcomes[1]))
+
+
 def main(to):
     board, board_fen = setup()
 
     depth = 4
 
-    if input() == "xboard":
-        sys.stdout.write("\n")
-        sys.stdout.flush()
-    else:
-        raise Exception("not xboard")
-
-    if input() == "protover 2":
-        sys.stdout.write("\n")
-        sys.stdout.flush()
-    else:
-        raise Exception("not protover 2")
-
-    sys.stdout.write("feature done=0 reuse=0 time=0 sigint=0 done=1" + "\n")
-    sys.stdout.flush()
-    i = input()
-
-    if i != "accepted done":
-        raise Exception("not accepted done")
-    if input() != "accepted reuse":
-        raise Exception("not accepted reuse")
-    if input() != "accepted time":
-        raise Exception("not accepted time")
-    if input() != "accepted sigint":
-        raise Exception("not accepted sigint")
-    if input() != "accepted done":
-        raise Exception("not accepted done")
-    if input() != "new":
-        raise Exception("not new")
-    if input() != "random":
-        raise Exception("not random")
-    if input().split(" ")[0] != "level":
-        raise Exception("not level")
-    if input() != "post":
-        raise Exception("not post")
-    if input() != "hard":
-        raise Exception("not hard")
-
-
     if to == "terminal":
         mainTerminal(board, board_fen, depth)
+    elif to == "stocky":
+        manager = Manager()
+        return_dict = manager.list()
+        jobs = []
+
+        for i in range(10):
+            p = Process(target=mainStocky, args=(i, return_dict, depth,))
+            jobs.append(p)
+            p.start()
+
+        for proc in jobs:
+            proc.join()
+
+        results = sum(return_dict)
+        print(str(results[0]) + "-" + str(results[1]))
+        #mainStocky(depth)
     elif to == "xboard":
+        if input() == "xboard":
+            sys.stdout.write("\n")
+            sys.stdout.flush()
+        else:
+            raise Exception("not xboard")
+
+        if input() == "protover 2":
+            sys.stdout.write("\n")
+            sys.stdout.flush()
+        else:
+            raise Exception("not protover 2")
+
+        sys.stdout.write("feature done=0 reuse=0 time=0 sigint=0" + "\n")
+        sys.stdout.write("feature option=\"UCI_LimitStrength -check 1\"" + "\n")
+        sys.stdout.write("feature done=1" + "\n")
+        sys.stdout.flush()
+
+        i = input()
+        if i != "accepted done":
+            raise Exception("not accepted done", i)
+        i = input()
+        if i != "accepted reuse":
+            raise Exception("not accepted reuse", i)
+        i = input()
+        if i != "accepted time":
+            raise Exception("not accepted time", i)
+        i = input()
+        if i != "accepted sigint":
+            raise Exception("not accepted sigint", i)
+        i = input()
+        if i != "accepted option":
+            raise Exception("not accepted option", i)
+        i = input()
+        if i != "accepted done":
+            raise Exception("not accepted done", i)
+        i = input()
+        if i != "new":
+            raise Exception("not new", i)
+        i = input()
+        if i != "random":
+            raise Exception("not random", i)
+        i = input()
+        if i.split(" ")[0] != "level":
+            raise Exception("not level", i)
+        i = input()
+        if i != "post":
+            raise Exception("not post", i)
+        i = input()
+        if i != "hard":
+            raise Exception("not hard", i)
+
+
         processInput(board, depth)
+
 
     return
 
 
 if __name__ == '__main__':
-    if len(sys.argv) == 2:
+    if len(sys.argv) > 1:
         if sys.argv[1] == 'terminal':
             main("terminal")
+        elif sys.argv[1] == 'stocky':
+            main("stocky")
         else:
             print("Usage: python engine.py terminal")
             raise Exception("Usage: python engine.py terminal")
