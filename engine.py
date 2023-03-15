@@ -7,7 +7,10 @@
 
 import sys
 import codecs
+import time
 from multiprocessing import Manager, Process
+
+import chess
 
 from utilities import *
 from search import *
@@ -26,45 +29,41 @@ if sys.stdout.encoding is None or sys.stdout.encoding == 'ANSI_X3.4-1968':
 
 gamePhase = 0
 
-def handle_input():
+def handle_input(board):
 
-    while True:
+    INPUT = input()
 
-        try:
-            INPUT = input()
-        except KeyboardInterrupt as ex:
-            sys.stdout.write(str(ex))
-            sys.stdout.flush()
-            continue
+    if INPUT == "white":
+        print("WHITE WHITE WHITE")
+        input()
+        return True
+    elif INPUT == "black":
+        print("BLACK BLACK BLACK")
 
-        if INPUT.split(" ")[0] == "time" or INPUT.split(" ")[0] == "otim":
-            continue
+    try:
+        move = chess.Move.from_uci(INPUT)
+    except ValueError as ex:
+        print(ex)
+        return
 
-        return INPUT
+    board.push(move)
+    return True
 
 def processInput(board, depth):
+
     while True:
 
-        INPUT = handle_input()
+        if not handle_input(board):
+            continue
 
         try:
-            move = chess.Move.from_uci(INPUT)
-
-            board.push(move)
-
             if board.is_game_over():
                 continue
 
-            # black should want a very negative score, white a very positive score
-            #sys.stdout.write("len")
-            #sys.stdout.write(str(len(board.piece_map())))
-            #sys.stdout.flush()
-            if len(board.piece_map()) < 10:
-                depth = 6
+            #if len(board.piece_map()) < 10:
+            #    depth = 6
 
             _, move = moveSearchMax(board, depth, float("-inf"), float("inf"))
-
-            #print("Move: ", move)
 
             board.push(move)
 
@@ -72,7 +71,6 @@ def processInput(board, depth):
             sys.stdout.flush()
         except Exception as ex:
             sys.stdout.write(repr(ex) + "\n")
-            sys.stdout.write(INPUT + "\n")
             sys.stdout.flush()
             raise Exception(repr(ex))
     return
@@ -99,6 +97,7 @@ def mainTerminal(board, board_fen, depth):
 
             # black should want a very negative score, white a very positive score
             _, move = moveSearchMax(board, depth, float("-inf"), float("inf"))
+            #_, move = quiescence(board, depth, float("-inf"), float("inf"))
 
             print("Opponent's move: ", move)
 
@@ -118,10 +117,10 @@ def mainTerminal(board, board_fen, depth):
     else:
         print("Black wins")
 
-def mainStocky(i, returnDict, depth):
+def mainStocky(i, returnDict, depth, t):
     outcomes = np.array([0.0, 0.0])
 
-    for j in range(4):
+    for j in range(1):
         board, _ = setup()
         print("Game " + str(j) + " on Thread " + str(i))
         k = 0
@@ -174,12 +173,14 @@ def mainStocky(i, returnDict, depth):
                 break
             #_ = input("press any key to continue")
         print(str(outcomes[0]) + "-" + str(outcomes[1]))
+    print(str(i) + " done time: " + str(round(time.time() - t, 4)))
 
 
 def main(to):
     board, board_fen = setup()
 
-    depth = 4
+    depth = 2
+    #print(depth, depth, depth)
 
     if to == "terminal":
         mainTerminal(board, board_fen, depth)
@@ -189,7 +190,7 @@ def main(to):
         jobs = []
 
         for i in range(10):
-            p = Process(target=mainStocky, args=(i, return_dict, depth,))
+            p = Process(target=mainStocky, args=(i, return_dict, depth, time.time(),))
             jobs.append(p)
             p.start()
 
@@ -213,47 +214,12 @@ def main(to):
             raise Exception("not protover 2")
 
         sys.stdout.write("feature done=0 reuse=0 time=0 sigint=0" + "\n")
-        sys.stdout.write("feature option=\"UCI_LimitStrength -check 1\"" + "\n")
+        sys.stdout.flush()
+        #sys.stdout.write("feature option=\"UCI_LimitStrength -check 1\"" + "\n")
         sys.stdout.write("feature done=1" + "\n")
         sys.stdout.flush()
 
-        i = input()
-        if i != "accepted done":
-            raise Exception("not accepted done", i)
-        i = input()
-        if i != "accepted reuse":
-            raise Exception("not accepted reuse", i)
-        i = input()
-        if i != "accepted time":
-            raise Exception("not accepted time", i)
-        i = input()
-        if i != "accepted sigint":
-            raise Exception("not accepted sigint", i)
-        i = input()
-        if i != "accepted option":
-            raise Exception("not accepted option", i)
-        i = input()
-        if i != "accepted done":
-            raise Exception("not accepted done", i)
-        i = input()
-        if i != "new":
-            raise Exception("not new", i)
-        i = input()
-        if i != "random":
-            raise Exception("not random", i)
-        i = input()
-        if i.split(" ")[0] != "level":
-            raise Exception("not level", i)
-        i = input()
-        if i != "post":
-            raise Exception("not post", i)
-        i = input()
-        if i != "hard":
-            raise Exception("not hard", i)
-
-
         processInput(board, depth)
-
 
     return
 

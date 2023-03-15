@@ -2,7 +2,8 @@ import chess
 from conversions import *
 
 def print_fen(fen):
-    rows = fen.split('/')
+    rows = fen.split(' ')[0].split('/')
+    print(rows)
     j = 0
     for row in rows:
         print(f'{8 - j} ', end='')
@@ -23,3 +24,4 @@ def setup():
     board_fen = board.fen().split(' ', 1)[0]
 
     return board, board_fen
+

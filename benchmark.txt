@@ -3,26 +3,69 @@ Benchmarking results:
 2/24/2023
 vs. Stockfish depth 10 ELO=1000
 Results: 20.0-36.0 (in favor of lancechess)
-Alpha-beta pruning, search to depth 4, standard piece weights, 1 piece map set, bisop pair, mobility, little random
+Ratio: 1-1.8
+Alpha-beta pruning, search to depth 4, standard piece weights, 1 piece map set, bishop pair, mobility, little random
+git commit 720d2d2
 
 2/24/2023
 vs. Stockfish depth 10 ELO=1200
 Results: 36.0-64.0 (in favor of lancechess)
-Alpha-beta pruning, search to depth 4, standard piece weights, 1 piece map set, bisop pair, mobility, little random
+Ratio: 1-1.78
+Alpha-beta pruning, search to depth 4, standard piece weights, 1 piece map set, bishop pair, mobility, little random
+git commit 720d2d2
 
 2/24/2023
 vs. Stockfish depth 10 ELO=1400
 Results: 24.0-36.0 (in favor of lancechess)
-Alpha-beta pruning, search to depth 4, standard piece weights, 1 piece map set, bisop pair, mobility, little random
+Ratio: 1-1.5
+Alpha-beta pruning, search to depth 4, standard piece weights, 1 piece map set, bishop pair, mobility, little random
+git commit 720d2d2
 
 2/25/2023
 vs. Stockfish depth 10 ELO=2400
 Results: 40.0-0.0 (in favor of stockfish)
-Alpha-beta pruning, search to depth 4, standard piece weights, 1 piece map set, bisop pair, mobility, little random
+Ratio: 1-0
+Alpha-beta pruning, search to depth 4, standard piece weights, 1 piece map set, bishop pair, mobility, little random
+git commit 720d2d2
 
 2/25/2023
 vs. Stockfish depth 10 ELO=1700
 Results: 24.5-15.5 (in favor of stockfish)
-Alpha-beta pruning, search to depth 4, standard piece weights, 1 piece map set, bisop pair, mobility, little random
+Ratio: 1.58-1
+Alpha-beta pruning, search to depth 4, standard piece weights, 1 piece map set, bishop pair, mobility, little random
+git commit 720d2d2
 
+2/25/2023
+vs. Stockfish depth 10 ELO=1560
+Results: 20.0-20.0
+Ratio: 1-1
+Alpha-beta pruning, search to depth 4, standard piece weights, 1 piece map set, bishop pair, mobility, little random
+git commit 720d2d2
 
+2/27/2023
+vs. Stockfish depth 10 ELO=1560
+Results: 17.0-3.0
+Ratio: 5.67-1
+Alpha-beta pruning, search to depth 4, standard piece weights
+git commit 720d2d2
+
+2/27/2023 ????????
+vs. Stockfish depth 10 ELO=200
+Results: 19.0-1.0
+Ratio: 19.0-1
+Alpha-beta pruning, search to depth 4, standard piece weights
+git commit 720d2d2
+
+2/27/2023
+vs. Stockfish depth 10 ELO=1000
+Results: 19.0-21.0
+Ratio: 1.0-1.11
+Alpha-beta pruning, search to depth 4, standard piece weights, 1 piece map set
+git commit 720d2d2
+
+2/27/2023
+vs. Stockfish depth 10 ELO=1200
+Results: 17.0-23.0
+Ratio: 1.0-1.11
+Alpha-beta pruning, search to depth 4, standard piece weights, 1 piece map set
+git commit 720d2d2
