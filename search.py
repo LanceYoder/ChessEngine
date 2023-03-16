@@ -1,13 +1,12 @@
-from eval import *
 from quiescence import *
+import globs
 
-# board is the current board, depth is the number of levels yet to recurse
-def moveSearchMax(board, depth, lowest, highest):
+def moveSearchMax(board, cur_level, depth, lowest, highest, colorWhite):
     #rint("okokokMAX: ", depth)
-    if depth == 0:
+    if cur_level == 0:
         #print("end msMax+++++++")
-        e_val = evalPos(board)
-        #quie, _ = quiescence(board, 2, lowest, highest)
+        e_val = evalPos(board, colorWhite)
+        #quie = quiescence(board, 2, lowest, highest, colorWhite)
         return (e_val, None)# if e_val > quie else (quie, None)
     moves = board.legal_moves
     minEval = float("-inf")
@@ -19,12 +18,12 @@ def moveSearchMax(board, depth, lowest, highest):
         #print("Smove    ", move)
         board.push(move)
         if board.is_game_over():
-            evaluation = evalPos(board)
+            evaluation = evalPos(board,colorWhite)
             bestMove = move
             board.pop()
             return evaluation, bestMove
 
-        evaluation, _ = moveSearchMax(board, depth - 1, hi, lo)
+        evaluation, _ = moveSearchMin(board, cur_level - 1, depth, lo, hi, colorWhite)
         board.pop()
 
         if minEval < evaluation:
@@ -32,18 +31,24 @@ def moveSearchMax(board, depth, lowest, highest):
             bestMove = move
 
         if minEval >= hi:
+            #if depth > len(globs.PV):
+            #    globs.PV.append(bestMove)
+            #else:
+            #    globs.PV[(depth - cur_level)/2] = bestMove
             return minEval, bestMove
         lo = max(lo, minEval)
 
+
+
     return minEval, bestMove
 
-def moveSearchMin(board, depth, lowest, highest):
+def moveSearchMin(board, cur_level, depth, lowest, highest, colorWhite):
     #print("okokokMIN: ", depth)
-    if depth == 0:
+    if cur_level == 0:
         #print("end moveMin-------")
-        e_val = evalPos(board)
-        #quie, _ = quiescence(board, 2, lowest, highest)
-        return (e_val, None)# if e_val > quie else (quie, None)
+        e_val = evalPos(board, colorWhite)
+        #quie = QmoveSearchMin(board, 2, lowest, highest, colorWhite)
+        return (e_val, None)# if e_val < quie else (quie, None)
     moves = board.legal_moves
     maxEval = float("inf")
     lo = lowest
@@ -54,12 +59,12 @@ def moveSearchMin(board, depth, lowest, highest):
         #print("Smove    ", move)
         board.push(move)
         if board.is_game_over():
-            evaluation = evalPos(board)
+            evaluation = evalPos(board, colorWhite)
             bestMove = move
             board.pop()
             return evaluation, bestMove
 
-        evaluation, _ = moveSearchMax(board, depth - 1, lo, hi)
+        evaluation, _ = moveSearchMax(board, cur_level - 1, depth, lo, hi, colorWhite)
         board.pop()
 
         if maxEval > evaluation:
@@ -67,7 +72,7 @@ def moveSearchMin(board, depth, lowest, highest):
             bestMove = move
 
         if maxEval <= lo:
-            return maxEval, move
+            return maxEval, bestMove
         hi = min(hi, maxEval)
 
     return maxEval, bestMove

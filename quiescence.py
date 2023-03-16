@@ -4,17 +4,16 @@ from eval import *
 # opening and ending, check ALL captures
 # middle game, check only same square captures
 # check checks for both? to what depth?
-def quiescence(board, depth, lowest, highest):
+def quiescence(board, depth, lowest, highest, colorWhite):
     #print("QQQQQQQ 1 - ", depth)
     print("depthMax: ", depth)
     if depth == 0:
         #print("end quie")
-        return evalPos(board), None
+        return evalPos(board, colorWhite)
     moves = board.legal_moves
     minEval = float("-inf")
     lo = lowest
     hi = highest
-    bestMove = None
 
     for i, move in enumerate(moves):
         #print("Qmove    ", move)
@@ -25,38 +24,35 @@ def quiescence(board, depth, lowest, highest):
         board.push(move)
         if board.is_game_over():
             # print("BOARD.GAME_OVER")
-            evaluation = evalPos(board)
-            bestMove = move
+            evaluation = evalPos(board, colorWhite)
             board.pop()
-            return evaluation, bestMove
+            return evaluation
 
-        evaluation, _ = QmoveSearchMin(board, depth - 1, lo, hi)#, quie)
+        evaluation = QmoveSearchMin(board, depth - 1, lo, hi, colorWhite)#, quie)
         board.pop()
 
         # print("minEvaluation: ", evaluation)
         # print("minEval: ", minEval)
         if evaluation > minEval:
             minEval = evaluation
-            bestMove = move
 
         if minEval >= hi:
-            return minEval, bestMove
+            return minEval
         lo = max(lo, minEval)
 
-    return minEval, bestMove
+    return minEval
 
-def QmoveSearchMin(board, depth, lowest, highest):
+def QmoveSearchMin(board, depth, lowest, highest, colorWhite):
     #print("QQQQQQQ 2 - ", depth)
     print("depthMin: ", depth)
     if depth == 0:
         #print("end q min move")
-        return evalPos(board), None
+        return evalPos(board, colorWhite)
     #print("lk")
     moves = board.legal_moves
     maxEval = float("inf")
     lo = lowest
     hi = highest
-    bestMove = None
 
     for i, move in enumerate(moves):
         #print("Qmove    ", move)
@@ -68,21 +64,19 @@ def QmoveSearchMin(board, depth, lowest, highest):
         # print("moveMin: ", move, "color: ", board.turn)
         board.push(move)
         if board.is_game_over():
-            evaluation = evalPos(board)
-            bestMove = move
+            evaluation = evalPos(board, colorWhite)
             board.pop()
-            return evaluation, bestMove
+            return evaluation
 
-        evaluation, _ = quiescence(board, depth - 1, lo, hi)
+        evaluation = quiescence(board, depth - 1, lo, hi, colorWhite)
         board.pop()
         # print("maxEvaluation: ", evaluation)
         # print("maxEval: ", maxEval)
         if maxEval > evaluation:
             maxEval = evaluation
-            bestMove = move
 
         if maxEval <= lo:
-            return maxEval, move
+            return maxEval
         hi = min(hi, maxEval)
 
-    return maxEval, bestMove
+    return maxEval

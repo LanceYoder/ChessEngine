@@ -4,10 +4,12 @@ import numpy as np
 from conversions import *
 from piece_maps import *
 
-def evalPos(board):
+def evalPos(board, colorWhite):
     #print("______________________")
     #white is going, so board.turn=False
     evaluation = 0
+
+
 
     #if board.turn then black wants a good score
     #if not board.turn then white wants a good score
@@ -19,14 +21,17 @@ def evalPos(board):
 
     # if
     if board.is_checkmate():
-        evaluation += 100000
+        if board.turn:
+            evaluation -= 100000
+        else:
+            evaluation += 100000
 
     # mobility
-    #evaluation -= board.legal_moves.count() / 60
+    evaluation -= board.legal_moves.count() / 6
 
     # bishop pair
-    #if board.pieces(chess.BISHOP, not board.turn):
-    #    evaluation += 5
+    if board.pieces(chess.BISHOP, not board.turn):
+        evaluation += 50
 
     pieces = board.piece_map()
     for p in pieces:
@@ -35,8 +40,9 @@ def evalPos(board):
         evaluation += pieceToScore(piece_type)
         # piece-square evaluation
         evaluation += pms(piece_type, p)
+    #print(str(evaluation))
 
-    return evaluation if not board.turn else -1 * evaluation
+    return evaluation if colorWhite else -1 * evaluation
 
 # return an int indicating game phase
 # 0-100, 0 being opening, 100 being endgame

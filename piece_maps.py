@@ -2,23 +2,23 @@
 
 def pms(piece_type, sqr):
     if piece_type == 'P':
-        return king_pos(sqr)
+        return pawn_pos(sqr)
     elif piece_type == 'p':
         return (-1) * pawn_pos(63 - sqr)
     elif piece_type == 'N':
-        return king_pos(sqr)
+        return knight_pos(sqr)
     elif piece_type == 'n':
         return (-1) * knight_pos(63 - sqr)
     elif piece_type == 'B':
-        return king_pos(sqr)
+        return bishop_pos(sqr)
     elif piece_type == 'b':
         return (-1) * bishop_pos(63 - sqr)
     elif piece_type == 'R':
-        return king_pos(sqr)
+        return rook_pos(sqr)
     elif piece_type == 'r':
         return (-1) * rook_pos(63 - sqr)
     elif piece_type == 'Q':
-        return king_pos(sqr)
+        return queen_pos(sqr)
     elif piece_type == 'q':
         return (-1) * queen_pos(63 - sqr)
     elif piece_type == 'K':

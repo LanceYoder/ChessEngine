@@ -10,11 +10,10 @@ import codecs
 import time
 from multiprocessing import Manager, Process
 
-import chess
-
 from utilities import *
 from search import *
 from stocky import *
+import globs
 
 #############################
 # weird thing to make it work
@@ -27,7 +26,7 @@ if sys.stdout.encoding is None or sys.stdout.encoding == 'ANSI_X3.4-1968':
         sys.stdout = utf8_writer(sys.stdout.buffer, errors='replace')
 #############################
 
-gamePhase = 0
+
 
 def handle_input(board):
 
@@ -36,9 +35,11 @@ def handle_input(board):
     if INPUT == "white":
         print("WHITE WHITE WHITE")
         input()
+        globs.colorWhite = True
         return True
     elif INPUT == "black":
         print("BLACK BLACK BLACK")
+        globs.colorWhite = False
 
     try:
         move = chess.Move.from_uci(INPUT)
@@ -52,7 +53,6 @@ def handle_input(board):
 def processInput(board, depth):
 
     while True:
-
         if not handle_input(board):
             continue
 
@@ -63,7 +63,8 @@ def processInput(board, depth):
             #if len(board.piece_map()) < 10:
             #    depth = 6
 
-            _, move = moveSearchMax(board, depth, float("-inf"), float("inf"))
+            #for i in range(1, 7, 2):
+            _, move = moveSearchMax(board, depth, 1, float("-inf"), float("inf"), globs.colorWhite)
 
             board.push(move)
 
@@ -179,7 +180,7 @@ def mainStocky(i, returnDict, depth, t):
 def main(to):
     board, board_fen = setup()
 
-    depth = 2
+    depth = 4
     #print(depth, depth, depth)
 
     if to == "terminal":
