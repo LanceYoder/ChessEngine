@@ -3,7 +3,3 @@ colorWhite = False
 
 # record depth of PV tables
 pvLength = 0
-
-TT = {}
-
-PV = []

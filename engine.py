@@ -10,7 +10,6 @@ import codecs
 #import time
 from multiprocessing import Manager, Process
 
-#from eval import game_phase
 import time
 
 import globs
@@ -40,22 +39,18 @@ def processInput(board, depth):
             if board.is_game_over():
                 continue
 
+            PV = make_PV(depth)
+            globs.pvLength = depth
 
-            mindepth = 1
-            maxdepth = 5
+            for i in range(1, depth):
+                evaluation, PV = moveSearchMax(board, i, i, float("-inf"), float("inf"), globs.colorWhite, gamephase, PV, True)
 
-
-            PV = make_PV(maxdepth)
-            globs.pvLength = maxdepth
-
-            for i in range(mindepth, maxdepth):
-                print(i)
-                _, PV = moveSearchMax(board, i, i, float("-inf"), float("inf"), globs.colorWhite, gamephase, PV, True)
-
-            #_, move = moveSearchMax(board, 4, 4, float("-inf"), float("inf"), globs.colorWhite, gamephase)
             move = PV[0][0]
             board.push(move)
             gamephase = game_phase(board)
+            print("evaluation: ", evaluation)
+            print("gamephase: ", gamephase)
+            print_fen(board.fen())
 
             sys.stdout.write("move " + move.uci() + "\n")
             sys.stdout.flush()
@@ -86,19 +81,22 @@ def mainTerminal(board, board_fen, depth):
             if board.is_game_over():
                 continue
 
-            # black should want a very negative score, white a very positive score
-            _, move = moveSearchMax(board, depth, depth, float("-inf"), float("inf"), globs.colorWhite, gamephase)
-            #_, move = quiescence(board, depth, float("-inf"), float("inf"))
+            PV = make_PV(depth)
+            globs.pvLength = depth
 
-            print("Opponent's move: ", move)
+            for i in range(1, depth):
+                print(i)
+                _, PV = moveSearchMax(board, i, i, float("-inf"), float("inf"), globs.colorWhite, gamephase, PV, True)
 
+            move = PV[0][0]
             board.push(move)
             gamephase = game_phase(board)
+
+            print("Opponent's move: ", move)
 
             board_fen = board.fen().split(' ', 1)[0]
 
             print_fen(board_fen)
-            # print("------------------")
         except Exception as ex:
             print("oops, ", ex)
 
@@ -114,8 +112,6 @@ def mainStocky(i, returnDict, depth, t):
 
     file = open('linreg.txt', 'a')
 
-
-
     for j in range(2):
         board, _ = setup()
         gamephase = 0
@@ -129,22 +125,25 @@ def mainStocky(i, returnDict, depth, t):
             move = chess.Move.from_uci(move)
 
             board.push(move)
-            #print_fen(board.fen().split(' ', 1)[0])
-            #print("_________________")
 
             if board.is_game_over():
                 handle_endgame(board, returnDict, file, outcomes, i, j)
                 break
 
-            _, move = moveSearchMax(board, depth, depth, float("-inf"), float("inf"), False, gamephase)
+            PV = make_PV(depth)
+            globs.pvLength = depth
 
+            for i in range(1, depth):
+                print(i)
+                _, PV = moveSearchMax(board, i, i, float("-inf"), float("inf"), globs.colorWhite, gamephase, PV, True)
+
+            move = PV[0][0]
             board.push(move)
             gamephase = game_phase(board)
 
             if board.is_game_over():
                 handle_endgame(board, returnDict, file, outcomes, i, j)
                 break
-            #_ = input("press any key to continue")
 
         print(str(outcomes[0]) + "-" + str(outcomes[1]))
     print(str(i) + " done time: " + str(round(time.time() - t, 4)))
@@ -152,8 +151,7 @@ def mainStocky(i, returnDict, depth, t):
 def main(to):
     board, board_fen = setup()
 
-    depth = 4
-    #print(depth, depth, depth)
+    depth = 5
 
     if to == "terminal":
         mainTerminal(board, board_fen, depth)
@@ -173,7 +171,6 @@ def main(to):
 
         results = sum(return_dict)
         print(str(results[0]) + "-" + str(results[1]))
-        #mainStocky(depth)
 
     elif to == "xboard":
         if input() == "xboard":
@@ -189,8 +186,6 @@ def main(to):
             raise Exception("not protover 2")
 
         sys.stdout.write("feature done=0 reuse=0 time=0 sigint=0" + "\n")
-        sys.stdout.flush()
-        #sys.stdout.write("feature option=\"UCI_LimitStrength -check 1\"" + "\n")
         sys.stdout.write("feature done=1" + "\n")
         sys.stdout.flush()
 

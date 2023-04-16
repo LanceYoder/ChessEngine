@@ -5,12 +5,8 @@ from utilities import pieceToScore
 from piece_maps import pms
 
 def evalPos(board, colorWhite, gamephase):
-    #print("______________________")
-    #white is going, so board.turn=False
-    evaluation = 0
 
-    #if board.turn then black wants a good score
-    #if not board.turn then white wants a good score
+    evaluation = 0
 
     # randomization so it doesn't just play rook moves when stuck
     # this shouldn't be necessary if my eval is good
@@ -20,15 +16,14 @@ def evalPos(board, colorWhite, gamephase):
     # if
     if board.is_checkmate():
         if board.turn:
-            evaluation -= 100000
+            return -1000000 if colorWhite else 1000000
         else:
-            evaluation += 100000
+            return 1000000 if colorWhite else -1000000
 
     # mobility
     evaluation -= board.legal_moves.count() / 6
 
     # bishop pair
-    #this might be wrong
     if len(board.pieces(chess.BISHOP, not board.turn)) == 2:
         evaluation += 50
 
@@ -39,7 +34,12 @@ def evalPos(board, colorWhite, gamephase):
         evaluation += pieceToScore(piece_type)
         # piece-square evaluation
         evaluation += pms(piece_type, p, gamephase)
-    #print(str(evaluation))
+
+    if board.is_stalemate():
+        if board.turn:
+            return -1000 if evaluation > 0 else 100
+        else:
+            return -1000 if evaluation < 0 else 100
 
     return evaluation if colorWhite else -1 * evaluation
 
@@ -68,4 +68,4 @@ def game_phase(board):
 
     gamePhase += board.fullmove_number / 2
 
-    return gamePhase
+    return gamePhase if gamePhase < 100 else 100

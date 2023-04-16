@@ -36,12 +36,12 @@ def handle_input(board):
     INPUT = input()
 
     if INPUT == "white":
-        print("WHITE WHITE WHITE")
+        print("Playing as white.")
         input()
         globs.colorWhite = True
         return True
     elif INPUT == "black":
-        print("BLACK BLACK BLACK")
+        print("Playing as black.")
         globs.colorWhite = False
 
     try:
