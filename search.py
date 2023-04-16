@@ -22,7 +22,7 @@ def moveSearchMax(board, cur_level, depth, lowest, highest, colorWhite, gamephas
 
     # try PV
     move = PV[depth - cur_level][0]
-    if move is not None and searchPV:
+    if move is not None and searchPV and board.is_legal(move):
         board.push(move)
         if board.is_game_over():
             evaluation = evalPos(board, colorWhite, gamephase)
@@ -43,18 +43,15 @@ def moveSearchMax(board, cur_level, depth, lowest, highest, colorWhite, gamephas
         if lo > PV[depth - cur_level][1]:
             if 1 == cur_level:
                 PV = make_PV(globs.pvLength)
-                print("remade max pv")
             PV[depth - cur_level] = (move, lo)
-            print("pvX-", PV)
 
     for move in moves:
         #print("Smove    ", move)
         board.push(move)
         if board.is_game_over():
             evaluation = evalPos(board, colorWhite, gamephase)
-            bestMove = move
             board.pop()
-            return evaluation, bestMove, PV
+            return evaluation, PV
 
         evaluation, PV = moveSearchMin(board, cur_level - 1, depth, lo, hi, colorWhite, gamephase, PV, False)
         board.pop()
@@ -70,9 +67,7 @@ def moveSearchMax(board, cur_level, depth, lowest, highest, colorWhite, gamephas
         if lo > PV[depth - cur_level][1]:
             if 1 == cur_level:
                 PV = make_PV(globs.pvLength)
-                print("remade max")
             PV[depth - cur_level] = (move, lo)
-            print("pvX", PV)
         #print("***********", lo, cur_level)
     #print("---------------", cur_level)
 
@@ -98,7 +93,7 @@ def moveSearchMin(board, cur_level, depth, lowest, highest, colorWhite, gamephas
 
     # try PV
     move = PV[depth - cur_level][0]
-    if move is not None and searchPV:
+    if move is not None and searchPV and board.is_legal(move):
         board.push(move)
         if board.is_game_over():
             evaluation = evalPos(board, colorWhite, gamephase)
@@ -118,9 +113,7 @@ def moveSearchMin(board, cur_level, depth, lowest, highest, colorWhite, gamephas
         if hi < PV[depth - cur_level][1]:
             if 1 == cur_level:
                 PV = make_PV(globs.pvLength)
-                print("remade min pv")
             PV[depth - cur_level] = (move, hi)
-            print("pvN-", PV)
 
     for move in moves:
         #print("Smove    ", move)
@@ -143,8 +136,6 @@ def moveSearchMin(board, cur_level, depth, lowest, highest, colorWhite, gamephas
         if hi < PV[depth - cur_level][1]:
             if 1 == cur_level:
                 PV = make_PV(globs.pvLength)
-                print("remade min")
             PV[depth - cur_level] = (move, hi)
-            print("pvN", PV)
 
     return maxEval, PV
