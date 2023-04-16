@@ -7,13 +7,16 @@
 
 import sys
 import codecs
-import time
+#import time
 from multiprocessing import Manager, Process
 
+#from eval import game_phase
+import time
+
+import globs
 from utilities import *
 from search import *
 from stocky import *
-import globs
 
 #############################
 # weird thing to make it work
@@ -26,31 +29,8 @@ if sys.stdout.encoding is None or sys.stdout.encoding == 'ANSI_X3.4-1968':
         sys.stdout = utf8_writer(sys.stdout.buffer, errors='replace')
 #############################
 
-
-
-def handle_input(board):
-
-    INPUT = input()
-
-    if INPUT == "white":
-        print("WHITE WHITE WHITE")
-        input()
-        globs.colorWhite = True
-        return True
-    elif INPUT == "black":
-        print("BLACK BLACK BLACK")
-        globs.colorWhite = False
-
-    try:
-        move = chess.Move.from_uci(INPUT)
-    except ValueError as ex:
-        print(ex)
-        return
-
-    board.push(move)
-    return True
-
 def processInput(board, depth):
+    gamephase = 0
 
     while True:
         if not handle_input(board):
@@ -60,13 +40,22 @@ def processInput(board, depth):
             if board.is_game_over():
                 continue
 
-            #if len(board.piece_map()) < 10:
-            #    depth = 6
 
-            #for i in range(1, 7, 2):
-            _, move = moveSearchMax(board, depth, 1, float("-inf"), float("inf"), globs.colorWhite)
+            mindepth = 1
+            maxdepth = 5
 
+
+            PV = make_PV(maxdepth)
+            globs.pvLength = maxdepth
+
+            for i in range(mindepth, maxdepth):
+                print(i)
+                _, PV = moveSearchMax(board, i, i, float("-inf"), float("inf"), globs.colorWhite, gamephase, PV, True)
+
+            #_, move = moveSearchMax(board, 4, 4, float("-inf"), float("inf"), globs.colorWhite, gamephase)
+            move = PV[0][0]
             board.push(move)
+            gamephase = game_phase(board)
 
             sys.stdout.write("move " + move.uci() + "\n")
             sys.stdout.flush()
@@ -80,6 +69,7 @@ def mainTerminal(board, board_fen, depth):
 
     print_fen(board_fen)
     print("------------------")
+    gamephase = 0
 
     while not board.is_game_over():
         try:
@@ -97,12 +87,13 @@ def mainTerminal(board, board_fen, depth):
                 continue
 
             # black should want a very negative score, white a very positive score
-            _, move = moveSearchMax(board, depth, float("-inf"), float("inf"))
+            _, move = moveSearchMax(board, depth, depth, float("-inf"), float("inf"), globs.colorWhite, gamephase)
             #_, move = quiescence(board, depth, float("-inf"), float("inf"))
 
             print("Opponent's move: ", move)
 
             board.push(move)
+            gamephase = game_phase(board)
 
             board_fen = board.fen().split(' ', 1)[0]
 
@@ -121,14 +112,19 @@ def mainTerminal(board, board_fen, depth):
 def mainStocky(i, returnDict, depth, t):
     outcomes = np.array([0.0, 0.0])
 
-    for j in range(1):
+    file = open('linreg.txt', 'a')
+
+
+
+    for j in range(2):
         board, _ = setup()
+        gamephase = 0
         print("Game " + str(j) + " on Thread " + str(i))
         k = 0
         while True:
             print(". Thread " + str(i) + " on Move " + str(k))
             k += 1
-            move = takeStock(board, board.fen())
+            move = takeStock(board.fen())
 
             move = chess.Move.from_uci(move)
 
@@ -137,45 +133,21 @@ def mainStocky(i, returnDict, depth, t):
             #print("_________________")
 
             if board.is_game_over():
-                print("IT'S ALL OVER")
-                print(board.outcome().result())
-                if board.outcome().winner is None:
-                    returnDict.append(np.array([0.5, 0.5]))
-                    outcomes += np.array([0.5, 0.5])
-                elif board.outcome().winner:
-                    returnDict.append(np.array([1, 0]))
-                    outcomes += np.array([1, 0])
-                else:
-                    returnDict.append(np.array([0, 1]))
-                    outcomes += np.array([0, 1])
-                print("Game " + str(j) + " on Thread " + str(i) + " DONE")
+                handle_endgame(board, returnDict, file, outcomes, i, j)
                 break
 
-            _, move = moveSearchMax(board, depth, float("-inf"), float("inf"))
-
-            # print("Move: ", move)
+            _, move = moveSearchMax(board, depth, depth, float("-inf"), float("inf"), False, gamephase)
 
             board.push(move)
-            #print_fen(board.fen().split(' ', 1)[0])
-            #print("_________________")
+            gamephase = game_phase(board)
+
             if board.is_game_over():
-                print("IT'S ALL OVER")
-                print(board.outcome().result())
-                if board.outcome().winner is None:
-                    returnDict.append(np.array([0.5, 0.5]))
-                    outcomes += np.array([0.5, 0.5])
-                elif board.outcome().winner:
-                    returnDict.append(np.array([1, 0]))
-                    outcomes += np.array([1, 0])
-                else:
-                    returnDict.append(np.array([0, 1]))
-                    outcomes += np.array([0, 1])
-                print("Game " + str(j) + " on Thread " + str(i) + " DONE")
+                handle_endgame(board, returnDict, file, outcomes, i, j)
                 break
             #_ = input("press any key to continue")
+
         print(str(outcomes[0]) + "-" + str(outcomes[1]))
     print(str(i) + " done time: " + str(round(time.time() - t, 4)))
-
 
 def main(to):
     board, board_fen = setup()
@@ -185,12 +157,13 @@ def main(to):
 
     if to == "terminal":
         mainTerminal(board, board_fen, depth)
+
     elif to == "stocky":
         manager = Manager()
         return_dict = manager.list()
         jobs = []
 
-        for i in range(10):
+        for i in range(4):
             p = Process(target=mainStocky, args=(i, return_dict, depth, time.time(),))
             jobs.append(p)
             p.start()
@@ -201,6 +174,7 @@ def main(to):
         results = sum(return_dict)
         print(str(results[0]) + "-" + str(results[1]))
         #mainStocky(depth)
+
     elif to == "xboard":
         if input() == "xboard":
             sys.stdout.write("\n")
