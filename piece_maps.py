@@ -1,5 +1,3 @@
-# all for white
-import globs
 
 def pms(piece_type, sqr, gamephase):
     mg = (100 - gamephase) / 100

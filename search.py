@@ -5,7 +5,7 @@ import globs
 def moveSearchMax(board, cur_level, depth, lowest, highest, colorWhite, gamephase, PV, searchPV):
 
     if cur_level == 0 or board.is_game_over() or board.is_stalemate():
-        return evalPos(board, colorWhite, gamephase), PV
+        return evalPos(board, colorWhite, gamephase)
 
     moves = board.legal_moves
     minEval = float("-inf")
@@ -55,7 +55,7 @@ def moveSearchMax(board, cur_level, depth, lowest, highest, colorWhite, gamephas
 def moveSearchMin(board, cur_level, depth, lowest, highest, colorWhite, gamephase, PV, searchPV):
 
     if cur_level == 0 or board.is_game_over() or board.is_stalemate():
-        return evalPos(board, colorWhite, gamephase), PV
+        return evalPos(board, colorWhite, gamephase)
 
     moves = board.legal_moves
     maxEval = float("inf")

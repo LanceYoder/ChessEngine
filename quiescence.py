@@ -4,37 +4,28 @@ from eval import *
 # opening and ending, check ALL captures
 # middle game, check only same square captures
 # check checks for both? to what depth?
-def quiescence(board, depth, lowest, highest, colorWhite):
-    #print("QQQQQQQ 1 - ", depth)
-    print("depthMax: ", depth)
+def quiescenceMax(board, depth, lowest, highest, colorWhite, gamephase):
     if depth == 0:
-        #print("end quie")
-        return evalPos(board, colorWhite)
+        return evalPos(board, colorWhite, gamephase)
     moves = board.legal_moves
     minEval = float("-inf")
     lo = lowest
     hi = highest
 
     for i, move in enumerate(moves):
-        #print("Qmove    ", move)
-        if not board.is_capture(move):
-            #print("-------------")
+        if not board.is_check():
             continue
-        # print("moveMax ", move, "color: ", board.turn)
+
         board.push(move)
         if board.is_game_over():
-            # print("BOARD.GAME_OVER")
-            evaluation = evalPos(board, colorWhite)
+            evaluation = evalPos(board, colorWhite, gamephase)
             board.pop()
             return evaluation
 
-        evaluation = QmoveSearchMin(board, depth - 1, lo, hi, colorWhite)#, quie)
+        evaluation = quiescenceMin(board, depth - 1, lo, hi, colorWhite, gamephase)
         board.pop()
 
-        # print("minEvaluation: ", evaluation)
-        # print("minEval: ", minEval)
-        if evaluation > minEval:
-            minEval = evaluation
+        minEval = max(evaluation, minEval)
 
         if minEval >= hi:
             return minEval
@@ -42,38 +33,30 @@ def quiescence(board, depth, lowest, highest, colorWhite):
 
     return minEval
 
-def QmoveSearchMin(board, depth, lowest, highest, colorWhite):
-    #print("QQQQQQQ 2 - ", depth)
-    print("depthMin: ", depth)
+def quiescenceMin(board, depth, lowest, highest, colorWhite, gamephase):
+
     if depth == 0:
-        #print("end q min move")
-        return evalPos(board, colorWhite)
-    #print("lk")
+        return evalPos(board, colorWhite, gamephase)
+
     moves = board.legal_moves
     maxEval = float("inf")
     lo = lowest
     hi = highest
 
     for i, move in enumerate(moves):
-        #print("Qmove    ", move)
-        if not board.is_capture(move):
-            #print("-------------")
+        if not board.is_check():
             continue
-        #else:
-        #    print(str(move))
-        # print("moveMin: ", move, "color: ", board.turn)
+
         board.push(move)
         if board.is_game_over():
-            evaluation = evalPos(board, colorWhite)
+            evaluation = evalPos(board, colorWhite, gamephase)
             board.pop()
             return evaluation
 
-        evaluation = quiescence(board, depth - 1, lo, hi, colorWhite)
+        evaluation = quiescenceMax(board, depth - 1, lo, hi, colorWhite, gamephase)
         board.pop()
-        # print("maxEvaluation: ", evaluation)
-        # print("maxEval: ", maxEval)
-        if maxEval > evaluation:
-            maxEval = evaluation
+
+        maxEval = min(evaluation, maxEval)
 
         if maxEval <= lo:
             return maxEval
