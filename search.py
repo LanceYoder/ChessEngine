@@ -5,7 +5,7 @@ import globs
 def moveSearchMax(board, cur_level, depth, lowest, highest, colorWhite, gamephase, PV, searchPV):
 
     if cur_level == 0 or board.is_game_over() or board.is_stalemate():
-        return evalPos(board, colorWhite, gamephase)
+        return evalPos(board, colorWhite, gamephase), PV
 
     moves = board.legal_moves
     minEval = float("-inf")
@@ -18,7 +18,15 @@ def moveSearchMax(board, cur_level, depth, lowest, highest, colorWhite, gamephas
 
         board.push(move)
 
-        evaluation, PV = moveSearchMin(board, cur_level - 1, depth, lo, hi, colorWhite, gamephase, PV, True)
+        if board.is_checkmate():
+            if board.turn:
+                evaluation = -1000000 - cur_level if colorWhite else 1000000 + cur_level
+            else:
+                evaluation = 1000000 + cur_level if colorWhite else -1000000 - cur_level
+
+        else:
+            evaluation, PV = moveSearchMin(board, cur_level - 1, depth, lo, hi, colorWhite, gamephase, PV, True)
+
         board.pop()
 
         minEval = max(evaluation, minEval)
@@ -34,8 +42,17 @@ def moveSearchMax(board, cur_level, depth, lowest, highest, colorWhite, gamephas
             PV[depth - cur_level] = (move, lo)
 
     for move in moves:
+
         board.push(move)
-        evaluation, PV = moveSearchMin(board, cur_level - 1, depth, lo, hi, colorWhite, gamephase, PV, False)
+        if board.is_checkmate():
+            if board.turn:
+                evaluation = -1000000 - cur_level if colorWhite else 1000000 + cur_level
+            else:
+                evaluation = 1000000 + cur_level if colorWhite else -1000000 - cur_level
+
+        else:
+            evaluation, PV = moveSearchMin(board, cur_level - 1, depth, lo, hi, colorWhite, gamephase, PV, False)
+
         board.pop()
 
         minEval = max(evaluation, minEval)
@@ -55,7 +72,7 @@ def moveSearchMax(board, cur_level, depth, lowest, highest, colorWhite, gamephas
 def moveSearchMin(board, cur_level, depth, lowest, highest, colorWhite, gamephase, PV, searchPV):
 
     if cur_level == 0 or board.is_game_over() or board.is_stalemate():
-        return evalPos(board, colorWhite, gamephase)
+        return evalPos(board, colorWhite, gamephase), PV
 
     moves = board.legal_moves
     maxEval = float("inf")
@@ -68,7 +85,14 @@ def moveSearchMin(board, cur_level, depth, lowest, highest, colorWhite, gamephas
 
         board.push(move)
 
-        evaluation, PV = moveSearchMax(board, cur_level - 1, depth, lo, hi, colorWhite, gamephase, PV, True)
+        if board.is_checkmate():
+            if board.turn:
+                evaluation = -1000000 - cur_level if colorWhite else 1000000 + cur_level
+            else:
+                evaluation = 1000000 + cur_level if colorWhite else -1000000 - cur_level
+
+        else:
+            evaluation, PV = moveSearchMax(board, cur_level - 1, depth, lo, hi, colorWhite, gamephase, PV, True)
         board.pop()
 
         maxEval = min(evaluation, maxEval)
@@ -87,7 +111,14 @@ def moveSearchMin(board, cur_level, depth, lowest, highest, colorWhite, gamephas
 
         board.push(move)
 
-        evaluation, PV = moveSearchMax(board, cur_level - 1, depth, lo, hi, colorWhite, gamephase, PV, False)
+        if board.is_checkmate():
+            if board.turn:
+                evaluation = -1000000 - cur_level if colorWhite else 1000000 + cur_level
+            else:
+                evaluation = 1000000 + cur_level if colorWhite else -1000000 - cur_level
+
+        else:
+            evaluation, PV = moveSearchMax(board, cur_level - 1, depth, lo, hi, colorWhite, gamephase, PV, False)
         board.pop()
 
         maxEval = min(evaluation, maxEval)

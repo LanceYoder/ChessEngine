@@ -13,13 +13,6 @@ def evalPos(board, colorWhite, gamephase):
     # but it might help make things interesting
     evaluation += np.random.rand()
 
-    # if
-    if board.is_checkmate():
-        if board.turn:
-            return -1000000 if colorWhite else 1000000
-        else:
-            return 1000000 if colorWhite else -1000000
-
     # mobility
     evaluation -= board.legal_moves.count() / 6
 
@@ -37,9 +30,9 @@ def evalPos(board, colorWhite, gamephase):
 
     if board.is_stalemate():
         if board.turn:
-            return -1000 if evaluation > 0 else 100
+            return -3000 if evaluation > 0 else 100
         else:
-            return -1000 if evaluation < 0 else 100
+            return -3000 if evaluation < 0 else 100
 
     return evaluation if colorWhite else -1 * evaluation
 

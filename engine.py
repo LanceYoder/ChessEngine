@@ -31,8 +31,13 @@ if sys.stdout.encoding is None or sys.stdout.encoding == 'ANSI_X3.4-1968':
 def processInput(board, depth):
     gamephase = 0
 
+    colorWhite = False
+
     while True:
-        if not handle_input(board):
+        success = handle_input(board)
+        if success == "white":
+            colorWhite = True
+        elif not success:
             continue
 
         try:
@@ -43,7 +48,7 @@ def processInput(board, depth):
             globs.pvLength = depth
 
             for i in range(1, depth):
-                evaluation, PV = moveSearchMax(board, i, i, float("-inf"), float("inf"), globs.colorWhite, gamephase, PV, True)
+                evaluation, PV = moveSearchMax(board, i, i, float("-inf"), float("inf"), colorWhite, gamephase, PV, True)
 
             move = PV[0][0]
             board.push(move)
@@ -67,38 +72,39 @@ def mainTerminal(board, board_fen, depth):
     gamephase = 0
 
     while not board.is_game_over():
-        try:
-            INPUT = input("Move:\n")
 
+        INPUT = input("Move:\n")
+
+        colorWhite = True
+
+        move = chess.Move.from_uci(INPUT)
+        while move not in board.legal_moves:
+            INPUT = input("Not a legal move. Try again:\n")
+            print("input: ", INPUT)
             move = chess.Move.from_uci(INPUT)
-            while move not in board.legal_moves:
-                INPUT = input("Not a legal move. Try again:\n")
-                print("input: ", INPUT)
-                move = chess.Move.from_uci(INPUT)
 
-            board.push(move)
+        board.push(move)
 
-            if board.is_game_over():
-                continue
+        if board.is_game_over():
+            continue
 
-            PV = make_PV(depth)
-            globs.pvLength = depth
+        PV = make_PV(depth)
+        globs.pvLength = depth
 
-            for i in range(1, depth):
-                print(i)
-                _, PV = moveSearchMax(board, i, i, float("-inf"), float("inf"), globs.colorWhite, gamephase, PV, True)
+        for i in range(1, depth):
+            print(i)
+            _, PV = moveSearchMax(board, i, i, float("-inf"), float("inf"), colorWhite, gamephase, PV, True)
 
-            move = PV[0][0]
-            board.push(move)
-            gamephase = game_phase(board)
+        move = PV[0][0]
+        board.push(move)
+        gamephase = game_phase(board)
 
-            print("Opponent's move: ", move)
+        print("Opponent's move: ", move)
 
-            board_fen = board.fen().split(' ', 1)[0]
+        board_fen = board.fen().split(' ', 1)[0]
 
-            print_fen(board_fen)
-        except Exception as ex:
-            print("oops, ", ex)
+        print_fen(board_fen)
+
 
     board_fen = board.fen().split(' ', 1)[0]
     print_fen(board_fen)
@@ -112,34 +118,54 @@ def mainStocky(i, returnDict, depth, t):
 
     file = open('linreg.txt', 'a')
 
-    for j in range(2):
+    for j in range(10):
         board, _ = setup()
         gamephase = 0
         print("Game " + str(j) + " on Thread " + str(i))
+        if i % 2 == 0:
+            colorWhite = False
+            print("stockfish playing as white on Thread " + str(i))
+        else:
+            colorWhite = True
+            print("stockfish playing as black on Thread " + str(i))
         k = 0
-        while True:
-            print(". Thread " + str(i) + " on Move " + str(k))
-            k += 1
+
+        if i % 2 == 0:
+
             move = takeStock(board.fen())
 
             move = chess.Move.from_uci(move)
 
             board.push(move)
 
-            if board.is_game_over():
-                handle_endgame(board, returnDict, file, outcomes, i, j)
-                break
+        while True:
+
+            print(". Thread " + str(i) + " on Move " + str(k))
+            k += 1
 
             PV = make_PV(depth)
             globs.pvLength = depth
 
-            for i in range(1, depth):
-                print(i)
-                _, PV = moveSearchMax(board, i, i, float("-inf"), float("inf"), globs.colorWhite, gamephase, PV, True)
+            for dep in range(1, depth):
+
+                _, PV = moveSearchMax(board, dep, dep, float("-inf"), float("inf"), colorWhite, gamephase, PV, True)
 
             move = PV[0][0]
             board.push(move)
             gamephase = game_phase(board)
+
+            if k > 120:
+                print_fen(board.fen())
+
+            if board.is_game_over():
+                handle_endgame(board, returnDict, file, outcomes, i, j)
+                break
+
+            move = takeStock(board.fen())
+
+            move = chess.Move.from_uci(move)
+
+            board.push(move)
 
             if board.is_game_over():
                 handle_endgame(board, returnDict, file, outcomes, i, j)
@@ -162,6 +188,7 @@ def main(to):
         jobs = []
 
         for i in range(4):
+
             p = Process(target=mainStocky, args=(i, return_dict, depth, time.time(),))
             jobs.append(p)
             p.start()

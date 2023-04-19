@@ -38,27 +38,26 @@ def handle_input(board):
     if INPUT == "white":
         print("Playing as white.")
         input()
-        globs.colorWhite = True
-        return True
+        return "white"
     elif INPUT == "black":
         print("Playing as black.")
-        globs.colorWhite = False
+        return "black"
 
     try:
         move = chess.Move.from_uci(INPUT)
     except ValueError as ex:
         print(ex)
-        return
+        return False
 
     board.push(move)
     return True
 
 # print results of a game to terminal. records games for regressions
-def handle_endgame(board, returnDict, file, outcomes, i ,j):
+def handle_endgame(board, returnDict, file, outcomes, i, j):
     print("IT'S ALL OVER")
     out = board.outcome()
     winner = out.winner
-    reso = out.result()
+
     try:
         move = board.pop()
     except IndexError:
@@ -80,7 +79,7 @@ def handle_endgame(board, returnDict, file, outcomes, i ,j):
     if winner is None:
         returnDict.append(np.array([0.5, 0.5]))
         outcomes += np.array([0.5, 0.5])
-    elif winner:
+    elif winner ^ i % 2 != 0:
         returnDict.append(np.array([1, 0]))
         outcomes += np.array([1, 0])
     else:
