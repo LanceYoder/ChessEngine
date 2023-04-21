@@ -69,3 +69,37 @@ Results: 17.0-23.0
 Ratio: 1.0-1.11
 Alpha-beta pruning, search to depth 4, standard piece weights, 1 piece map set
 git commit 720d2d2
+
+4/19
+stockfish elo 1560
+results: 17.0-23.0
+ratio: 1-1.35
+final version, no parameter optimization
+git commit 42427f5
+
+4/19
+stockfish elo 1300
+results: 7.5-32.5
+ratio: 1-4.33
+final version, no parameter optimization
+git commit 42427f5
+
+4/19
+stockfish elo 1700
+results: 20.0-20.0
+ratio: 1-1
+final version, no parameter optimization
+git commit 42427f5
+
+4/19
+stockfish elo 1850
+results: 32.5-7.5
+ratio: 1-0.23
+final version, no parameter optimization
+git commit 42427f5
+
+4/20
+stockfish elo 1300
+results: 19.5-20.5
+ratio: 1-1.05
+just original piece weights

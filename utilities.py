@@ -79,7 +79,7 @@ def handle_endgame(board, returnDict, file, outcomes, i, j):
     if winner is None:
         returnDict.append(np.array([0.5, 0.5]))
         outcomes += np.array([0.5, 0.5])
-    elif winner ^ i % 2 != 0:
+    elif winner ^ (i+j) % 2 != 0:
         returnDict.append(np.array([1, 0]))
         outcomes += np.array([1, 0])
     else:

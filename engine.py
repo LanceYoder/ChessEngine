@@ -9,6 +9,7 @@ import sys
 import codecs
 #import time
 from multiprocessing import Manager, Process
+import multiprocessing as mp
 
 import time
 
@@ -118,58 +119,55 @@ def mainStocky(i, returnDict, depth, t):
 
     file = open('linreg.txt', 'a')
 
-    for j in range(10):
+    for j in range(1):
         board, _ = setup()
         gamephase = 0
         print("Game " + str(j) + " on Thread " + str(i))
-        if i % 2 == 0:
+        if (i+j) % 2 == 0:
+            move = takeStock(board.fen())
+            move = chess.Move.from_uci(move)
+            board.push(move)
+
             colorWhite = False
             print("stockfish playing as white on Thread " + str(i))
         else:
             colorWhite = True
             print("stockfish playing as black on Thread " + str(i))
+
         k = 0
-
-        if i % 2 == 0:
-
-            move = takeStock(board.fen())
-
-            move = chess.Move.from_uci(move)
-
-            board.push(move)
-
         while True:
+            try:
+                if k % 10 == 0:
+                    print(". Thread " + str(i) + " on Move " + str(k))
+                k += 1
 
-            print(". Thread " + str(i) + " on Move " + str(k))
-            k += 1
+                PV = make_PV(depth)
+                globs.pvLength = depth
 
-            PV = make_PV(depth)
-            globs.pvLength = depth
+                for dep in range(1, depth):
+                    _, PV = moveSearchMax(board, dep, dep, float("-inf"), float("inf"), colorWhite, gamephase, PV, True)
 
-            for dep in range(1, depth):
+                move = PV[0][0]
+                board.push(move)
+                gamephase = game_phase(board)
 
-                _, PV = moveSearchMax(board, dep, dep, float("-inf"), float("inf"), colorWhite, gamephase, PV, True)
+                if board.is_game_over():
+                    handle_endgame(board, returnDict, file, outcomes, i, j)
+                    break
 
-            move = PV[0][0]
-            board.push(move)
-            gamephase = game_phase(board)
+                move = takeStock(board.fen())
 
-            if k > 120:
+                move = chess.Move.from_uci(move)
+
+                board.push(move)
+
+                if board.is_game_over():
+                    handle_endgame(board, returnDict, file, outcomes, i, j)
+                    break
+            except Exception as ex:
+                print(ex)
                 print_fen(board.fen())
-
-            if board.is_game_over():
-                handle_endgame(board, returnDict, file, outcomes, i, j)
-                break
-
-            move = takeStock(board.fen())
-
-            move = chess.Move.from_uci(move)
-
-            board.push(move)
-
-            if board.is_game_over():
-                handle_endgame(board, returnDict, file, outcomes, i, j)
-                break
+                raise ex
 
         print(str(outcomes[0]) + "-" + str(outcomes[1]))
     print(str(i) + " done time: " + str(round(time.time() - t, 4)))
@@ -187,14 +185,22 @@ def main(to):
         return_dict = manager.list()
         jobs = []
 
-        for i in range(4):
+        num_workers = mp.cpu_count()
 
-            p = Process(target=mainStocky, args=(i, return_dict, depth, time.time(),))
-            jobs.append(p)
-            p.start()
+        pool = mp.Pool(num_workers)
 
-        for proc in jobs:
-            proc.join()
+        for i in range(40):
+            pool.apply_async(mainStocky, args=(i, return_dict, depth, time.time(),))
+
+            #p = Process(target=mainStocky, args=(i, return_dict, depth, time.time(),))
+            #jobs.append(p)
+            #p.start()
+
+        #for proc in jobs:
+        #    proc.join()
+
+        pool.close()
+        pool.join()
 
         results = sum(return_dict)
         print(str(results[0]) + "-" + str(results[1]))

@@ -14,11 +14,11 @@ def evalPos(board, colorWhite, gamephase):
     evaluation += np.random.rand()
 
     # mobility
-    evaluation -= board.legal_moves.count() / 6
+    #evaluation -= board.legal_moves.count() / 6
 
     # bishop pair
-    if len(board.pieces(chess.BISHOP, not board.turn)) == 2:
-        evaluation += 50
+    #if len(board.pieces(chess.BISHOP, not board.turn)) == 2:
+    #    evaluation += 50
 
     pieces = board.piece_map()
     for p in pieces:
@@ -26,7 +26,7 @@ def evalPos(board, colorWhite, gamephase):
         # piece weights
         evaluation += pieceToScore(piece_type)
         # piece-square evaluation
-        evaluation += pms(piece_type, p, gamephase)
+        #evaluation += pms(piece_type, p, gamephase)
 
     if board.is_stalemate():
         if board.turn:
