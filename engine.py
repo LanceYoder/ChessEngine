@@ -76,7 +76,7 @@ def mainTerminal(board, board_fen, depth):
 
         INPUT = input("Move:\n")
 
-        colorWhite = True
+        colorWhite = False
 
         move = chess.Move.from_uci(INPUT)
         while move not in board.legal_moves:
