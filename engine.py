@@ -136,38 +136,33 @@ def mainStocky(i, returnDict, depth, t):
 
         k = 0
         while True:
-            try:
-                if k % 10 == 0:
-                    print(". Thread " + str(i) + " on Move " + str(k))
-                k += 1
+            if k % 10 == 0:
+                print(". Thread " + str(i) + " on Move " + str(k))
+            k += 1
 
-                PV = make_PV(depth)
-                globs.pvLength = depth
+            PV = make_PV(depth)
+            globs.pvLength = depth
 
-                for dep in range(1, depth):
-                    _, PV = moveSearchMax(board, dep, dep, float("-inf"), float("inf"), colorWhite, gamephase, PV, True)
+            for dep in range(1, depth):
+                _, PV = moveSearchMax(board, dep, dep, float("-inf"), float("inf"), colorWhite, gamephase, PV, True)
 
-                move = PV[0][0]
-                board.push(move)
-                gamephase = game_phase(board)
+            move = PV[0][0]
+            board.push(move)
+            gamephase = game_phase(board)
 
-                if board.is_game_over():
-                    handle_endgame(board, returnDict, file, outcomes, i, j)
-                    break
+            if board.is_game_over():
+                handle_endgame(board, returnDict, file, outcomes, i, j)
+                break
 
-                move = takeStock(board.fen())
+            move = takeStock(board.fen())
 
-                move = chess.Move.from_uci(move)
+            move = chess.Move.from_uci(move)
 
-                board.push(move)
+            board.push(move)
 
-                if board.is_game_over():
-                    handle_endgame(board, returnDict, file, outcomes, i, j)
-                    break
-            except Exception as ex:
-                print(ex)
-                print_fen(board.fen())
-                raise ex
+            if board.is_game_over():
+                handle_endgame(board, returnDict, file, outcomes, i, j)
+                break
 
         print(str(outcomes[0]) + "-" + str(outcomes[1]))
     print(str(i) + " done time: " + str(round(time.time() - t, 4)))
