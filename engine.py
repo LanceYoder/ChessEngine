@@ -178,10 +178,12 @@ def main(to):
     elif to == "stocky":
         numGames = int(sys.argv[2])
         stockyElo = int(sys.argv[3])
+        if stockyElo < 800:
+            print("it's numGames then stockyElo")
+            return
 
         manager = Manager()
         return_dict = manager.list()
-        jobs = []
 
         num_workers = mp.cpu_count()
 
