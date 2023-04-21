@@ -136,8 +136,8 @@ def mainStocky(i, returnDict, depth, t):
 
         k = 0
         while True:
-            if k % 10 == 0:
-                print(". Thread " + str(i) + " on Move " + str(k))
+            #if k % 10 == 0:
+            print(". Thread " + str(i) + " on Move " + str(k))
             k += 1
 
             PV = make_PV(depth)
