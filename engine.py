@@ -93,7 +93,6 @@ def mainTerminal(board, board_fen, depth):
         globs.pvLength = depth
 
         for i in range(1, depth):
-            print(i)
             _, PV = moveSearchMax(board, i, i, float("-inf"), float("inf"), colorWhite, gamephase, PV, True)
 
         move = PV[0][0]
@@ -102,9 +101,7 @@ def mainTerminal(board, board_fen, depth):
 
         print("Opponent's move: ", move)
 
-        board_fen = board.fen().split(' ', 1)[0]
-
-        print_fen(board_fen)
+        print_fen(board.fen().split(' ', 1)[0])
 
 
     board_fen = board.fen().split(' ', 1)[0]
@@ -149,6 +146,8 @@ def mainStocky(i, returnDict, depth, t, stockyElo):
             move = PV[0][0]
             board.push(move)
             gamephase = game_phase(board)
+
+            print_fen(board.fen().split(' ', 1)[0])
 
             if board.is_game_over():
                 handle_endgame(board, returnDict, file, outcomes, i, j)
