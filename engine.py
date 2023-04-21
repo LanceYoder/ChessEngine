@@ -184,23 +184,15 @@ def main(to):
         return_dict = manager.list()
         jobs = []
 
-        #num_workers = mp.cpu_count()
+        num_workers = mp.cpu_count()
 
-        #pool = mp.Pool(num_workers)
+        pool = mp.Pool(num_workers)
 
         for i in range(4):
-        #    pool.apply_async(mainStocky, args=(i, return_dict, depth, time.time(),))
-            mainStocky(i, return_dict, depth, time.time())
+            pool.apply_async(mainStocky, args=(i, return_dict, depth, time.time(),))
 
-            #p = Process(target=mainStocky, args=(i, return_dict, depth, time.time(),))
-            #jobs.append(p)
-            #p.start()
-
-        #for proc in jobs:
-        #    proc.join()
-
-        #pool.close()
-        #pool.join()
+        pool.close()
+        pool.join()
 
         results = sum(return_dict)
         print(str(results[0]) + "-" + str(results[1]))
