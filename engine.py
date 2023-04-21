@@ -114,7 +114,7 @@ def mainTerminal(board, board_fen, depth):
     else:
         print("Black wins")
 
-def mainStocky(i, returnDict, depth, t):
+def mainStocky(i, returnDict, depth, t, stockyElo):
     outcomes = np.array([0.0, 0.0])
 
     file = open('linreg.txt', 'a')
@@ -124,7 +124,7 @@ def mainStocky(i, returnDict, depth, t):
         gamephase = 0
         print("Game " + str(j) + " on Thread " + str(i))
         if (i+j) % 2 == 0:
-            move = takeStock(board.fen())
+            move = takeStock(board.fen(), stockyElo=stockyElo)
             move = chess.Move.from_uci(move)
             board.push(move)
 
@@ -154,7 +154,7 @@ def mainStocky(i, returnDict, depth, t):
                 handle_endgame(board, returnDict, file, outcomes, i, j)
                 break
 
-            move = takeStock(board.fen())
+            move = takeStock(board.fen(), stockyElo=stockyElo)
 
             move = chess.Move.from_uci(move)
 
@@ -176,6 +176,9 @@ def main(to):
         mainTerminal(board, board_fen, depth)
 
     elif to == "stocky":
+        numGames = int(sys.argv[2])
+        stockyElo = int(sys.argv[3])
+
         manager = Manager()
         return_dict = manager.list()
         jobs = []
@@ -184,8 +187,8 @@ def main(to):
 
         pool = mp.Pool(num_workers)
 
-        for i in range(4):
-            pool.apply_async(mainStocky, args=(i, return_dict, depth, time.time(),))
+        for i in range(numGames):
+            pool.apply_async(mainStocky, args=(i, return_dict, depth, time.time(), stockyElo,))
 
         pool.close()
         pool.join()
