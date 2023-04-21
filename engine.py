@@ -154,7 +154,11 @@ def mainStocky(i, returnDict, depth, t):
                 handle_endgame(board, returnDict, file, outcomes, i, j)
                 break
             print("here")
-            move = takeStock(board.fen())
+            try:
+                move = takeStock(board.fen())
+            except Exception as ex:
+                print(ex)
+                raise ex
             print("not here")
             move = chess.Move.from_uci(move)
 
