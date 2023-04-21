@@ -114,12 +114,11 @@ def mainTerminal(board, board_fen, depth):
 def mainStocky(i, returnDict, depth, t, stockyElo):
     outcomes = np.array([0.0, 0.0])
 
-    file = open('linreg.txt', 'a')
-
     for j in range(1):
         board, _ = setup()
         gamephase = 0
         print("Game " + str(j) + " on Thread " + str(i))
+
         if (i+j) % 2 == 0:
             move = takeStock(board.fen(), stockyElo=stockyElo)
             move = chess.Move.from_uci(move)
@@ -150,7 +149,7 @@ def mainStocky(i, returnDict, depth, t, stockyElo):
             print_fen(board.fen().split(' ', 1)[0])
 
             if board.is_game_over():
-                handle_endgame(board, returnDict, file, outcomes, i, j)
+                handle_endgame(board, returnDict, i, j)
                 break
 
             move = takeStock(board.fen(), stockyElo=stockyElo)
@@ -160,7 +159,7 @@ def mainStocky(i, returnDict, depth, t, stockyElo):
             board.push(move)
 
             if board.is_game_over():
-                handle_endgame(board, returnDict, file, outcomes, i, j)
+                handle_endgame(board, returnDict, i, j)
                 break
 
         print(str(outcomes[0]) + "-" + str(outcomes[1]))
