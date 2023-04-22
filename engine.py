@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 #-----------------------------------------------------------------------
 # engine.py
@@ -132,8 +132,8 @@ def mainStocky(i, returnDict, depth, t, stockyElo):
 
         k = 0
         while True:
-            #if k % 10 == 0:
-            print(". Thread " + str(i) + " on Move " + str(k))
+            if k % 10 == 0:
+                print(". Thread " + str(i) + " on Move " + str(k))
             k += 1
 
             PV = make_PV(depth)
@@ -146,10 +146,10 @@ def mainStocky(i, returnDict, depth, t, stockyElo):
             board.push(move)
             gamephase = game_phase(board)
 
-            print_fen(board.fen().split(' ', 1)[0])
+            #print_fen(board.fen().split(' ', 1)[0])
 
             if board.is_game_over():
-                handle_endgame(board, returnDict, i, j)
+                handle_endgame(board, returnDict, outcomes, i, j)
                 break
 
             move = takeStock(board.fen(), stockyElo=stockyElo)
@@ -179,7 +179,9 @@ def main(to):
         if stockyElo < 800:
             print("it's numGames then stockyElo")
             return
+        #return_dict = []
 
+        #mainStocky(1, return_dict, depth, time.time(), stockyElo)
         manager = Manager()
         return_dict = manager.list()
 

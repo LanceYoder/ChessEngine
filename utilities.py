@@ -53,17 +53,20 @@ def handle_input(board):
     return True
 
 # print results of a game to terminal. records games for regressions
-def handle_endgame(board, returnDict, i, j):
+def handle_endgame(board, returnDict, outcomes, i, j):
     print("IT'S ALL OVER")
     out = board.outcome()
     winner = out.winner
 
     if winner is None:
         returnDict.append(np.array([0.5, 0.5]))
+        outcomes += np.array([0.5, 0.5])
     elif winner ^ (i+j) % 2 != 0:
         returnDict.append(np.array([1, 0]))
+        outcomes += np.array([1, 0])
     else:
         returnDict.append(np.array([0, 1]))
+        outcomes += np.array([0, 1])
     print("Game " + str(j) + " on Thread " + str(i) + " DONE")
 
 # convert characters to unicode. used for printing to termianl
