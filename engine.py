@@ -114,55 +114,61 @@ def mainTerminal(board, board_fen, depth):
 def mainStocky(i, returnDict, depth, t, stockyElo):
     outcomes = np.array([0.0, 0.0])
 
-    for j in range(1):
-        board, _ = setup()
-        gamephase = 0
-        print("Game " + str(j) + " on Thread " + str(i))
+    try:
+        for j in range(1):
+            board, _ = setup()
+            gamephase = 0
+            print("Game " + str(j) + " on Thread " + str(i))
 
-        if (i+j) % 2 == 0:
-            move = takeStock(board.fen(), stockyElo=stockyElo)
-            move = chess.Move.from_uci(move)
-            board.push(move)
+            if (i+j) % 2 == 0:
+                move = takeStock(board.fen(), stockyElo=stockyElo)
+                move = chess.Move.from_uci(move)
+                board.push(move)
 
-            colorWhite = False
-            print("stockfish playing as white on Thread " + str(i))
-        else:
-            colorWhite = True
-            print("stockfish playing as black on Thread " + str(i))
+                colorWhite = False
+                print("stockfish playing as white on Thread " + str(i))
+            else:
+                colorWhite = True
+                print("stockfish playing as black on Thread " + str(i))
 
-        k = 0
-        while True:
-            if k % 10 == 0:
-                print(". Thread " + str(i) + " on Move " + str(k))
-            k += 1
+            k = 0
+            while True:
+                if k % 10 == 0:
+                    print(". Thread " + str(i) + " on Move " + str(k))
+                k += 1
 
-            PV = make_PV(depth)
-            globs.pvLength = depth
+                PV = make_PV(depth)
+                globs.pvLength = depth
 
-            for dep in range(1, depth):
-                _, PV = moveSearchMax(board, dep, dep, float("-inf"), float("inf"), colorWhite, gamephase, PV, True)
+                for dep in range(1, depth):
+                    _, PV = moveSearchMax(board, dep, dep, float("-inf"), float("inf"), colorWhite, gamephase, PV, True)
 
-            move = PV[0][0]
-            board.push(move)
-            gamephase = game_phase(board)
+                move = PV[0][0]
+                board.push(move)
+                gamephase = game_phase(board)
 
-            #print_fen(board.fen().split(' ', 1)[0])
+                #print_fen(board.fen().split(' ', 1)[0])
 
-            if board.is_game_over():
-                handle_endgame(board, returnDict, outcomes, i, j)
-                break
+                if board.is_game_over():
+                    handle_endgame(board, returnDict, outcomes, i, j)
+                    break
 
-            move = takeStock(board.fen(), stockyElo=stockyElo)
+                move = takeStock(board.fen(), stockyElo=stockyElo)
 
-            move = chess.Move.from_uci(move)
+                move = chess.Move.from_uci(move)
 
-            board.push(move)
+                board.push(move)
 
-            if board.is_game_over():
-                handle_endgame(board, returnDict, i, j)
-                break
+                if board.is_game_over():
+                    handle_endgame(board, returnDict, outcomes, i, j)
+                    break
 
-        print(str(outcomes[0]) + "-" + str(outcomes[1]))
+            print(str(outcomes[0]) + "-" + str(outcomes[1]))
+    except Exception as ex:
+        print("*()(&^%$^%#^$&%*(*)(_*&)^(%*$&#^$&%*&^(&)")
+        print(ex)
+        print("*()(&^%$^%#^$&%*(*)(_*&)^(%*$&#^$&%*&^(&)")
+
     print(str(i) + " done time: " + str(round(time.time() - t, 4)))
 
 def main(to):
@@ -189,8 +195,13 @@ def main(to):
 
         pool = mp.Pool(num_workers)
 
+        errA = []
+
         for i in range(numGames):
-            pool.apply_async(mainStocky, args=(i, return_dict, depth, time.time(), stockyElo,))
+            errA.append(pool.apply_async(mainStocky, args=(i, return_dict, depth, time.time(), stockyElo,)))
+
+        for x in errA:
+            x.get()
 
         pool.close()
         pool.join()
