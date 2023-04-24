@@ -14,6 +14,7 @@ import multiprocessing as mp
 import time
 
 import globs
+from globs import weight_sets
 from utilities import *
 from search import *
 from stocky import *
@@ -49,7 +50,8 @@ def processInput(board, depth):
             globs.pvLength = depth
 
             for i in range(1, depth):
-                evaluation, PV = moveSearchMax(board, i, i, float("-inf"), float("inf"), colorWhite, gamephase, PV, True)
+                evaluation, PV = moveSearchMax(board, i, i, float("-inf"), float("inf"),
+                                               colorWhite, gamephase, PV, True)
 
             move = PV[0][0]
             board.push(move)
@@ -93,7 +95,8 @@ def mainTerminal(board, board_fen, depth):
         globs.pvLength = depth
 
         for i in range(1, depth):
-            _, PV = moveSearchMax(board, i, i, float("-inf"), float("inf"), colorWhite, gamephase, PV, True)
+            _, PV = moveSearchMax(board, i, i, float("-inf"), float("inf"),
+                                  colorWhite, gamephase, PV, True)
 
         move = PV[0][0]
         board.push(move)
@@ -113,61 +116,132 @@ def mainTerminal(board, board_fen, depth):
 
 def mainStocky(i, returnDict, depth, t, stockyElo):
     outcomes = np.array([0.0, 0.0])
+    globs.pvLength = depth
 
     try:
-        for j in range(1):
-            board, _ = setup()
-            gamephase = 0
-            print("Game " + str(j) + " on Thread " + str(i))
+        board, _ = setup()
+        gamephase = 0
+        print("Game 1 on Thread " + str(i))
 
-            if (i+j) % 2 == 0:
-                move = takeStock(board.fen(), stockyElo=stockyElo)
-                move = chess.Move.from_uci(move)
-                board.push(move)
+        if i % 2 == 0:
+            move = takeStock(board.fen(), stockyElo=stockyElo)
+            move = chess.Move.from_uci(move)
+            board.push(move)
 
-                colorWhite = False
-                print("stockfish playing as white on Thread " + str(i))
-            else:
-                colorWhite = True
-                print("stockfish playing as black on Thread " + str(i))
+            colorWhite = False
+            print("stockfish playing as white on Thread " + str(i))
+        else:
+            colorWhite = True
+            print("stockfish playing as black on Thread " + str(i))
 
-            k = 0
-            while True:
-                if k % 10 == 0:
-                    print(". Thread " + str(i) + " on Move " + str(k))
-                k += 1
+        k = 0
+        while True:
+            if k % 10 == 0:
+                print(". Thread " + str(i) + " on Move " + str(k))
+            k += 1
 
-                PV = make_PV(depth)
-                globs.pvLength = depth
+            PV = make_PV(depth)
 
-                for dep in range(1, depth):
-                    _, PV = moveSearchMax(board, dep, dep, float("-inf"), float("inf"), colorWhite, gamephase, PV, True)
+            for dep in range(1, depth):
+                _, PV = moveSearchMax(board, dep, dep, float("-inf"), float("inf"),
+                                      colorWhite, gamephase, PV, True)
 
-                move = PV[0][0]
-                board.push(move)
-                gamephase = game_phase(board)
+            move = PV[0][0]
+            board.push(move)
+            gamephase = game_phase(board)
 
-                #print_fen(board.fen().split(' ', 1)[0])
+            if board.is_game_over():
+                handle_endgame(board, returnDict, outcomes, i)
+                break
 
-                if board.is_game_over():
-                    handle_endgame(board, returnDict, outcomes, i, j)
-                    break
+            move = takeStock(board.fen(), stockyElo=stockyElo)
 
-                move = takeStock(board.fen(), stockyElo=stockyElo)
+            move = chess.Move.from_uci(move)
 
-                move = chess.Move.from_uci(move)
+            board.push(move)
 
-                board.push(move)
+            if board.is_game_over():
+                handle_endgame(board, returnDict, outcomes, i)
+                break
 
-                if board.is_game_over():
-                    handle_endgame(board, returnDict, outcomes, i, j)
-                    break
-
-            print(str(outcomes[0]) + "-" + str(outcomes[1]))
+        print(str(outcomes[0]) + "-" + str(outcomes[1]))
     except Exception as ex:
-        print("*()(&^%$^%#^$&%*(*)(_*&)^(%*$&#^$&%*&^(&)")
         print(ex)
-        print("*()(&^%$^%#^$&%*(*)(_*&)^(%*$&#^$&%*&^(&)")
+        raise ex
+
+    print(str(i) + " done time: " + str(round(time.time() - t, 4)))
+
+def mainSelf(i, returnDict, depth, t, set1, set2):
+    outcomes = np.array([0.0, 0.0])
+
+    try:
+        board, _ = setup()
+        gamephase = 0
+        globs.pvLength = depth
+        print("Game 1 on Thread " + str(i))
+
+        if i % 2 == 0:
+
+            PV = make_PV(depth)
+
+            for dep in range(1, depth):
+                _, PV = moveSearchMax(board, dep, dep, float("-inf"), float("inf"),
+                                      True, gamephase, PV, True, set1=set2, set2=set1)
+
+            move = PV[0][0]
+            board.push(move)
+            gamephase = game_phase(board)
+
+            colorWhite = False
+            firstSet = set2
+            secondSet = set1
+            print("stockfish playing as white on Thread " + str(i))
+        else:
+            firstSet = set1
+            secondSet = set2
+            colorWhite = True
+            print("stockfish playing as black on Thread " + str(i))
+
+        k = 0
+        while True:
+            if k % 10 == 0:
+                print(". Thread " + str(i) + " on Move " + str(k))
+            k += 1
+
+            PV = make_PV(depth)
+
+            for dep in range(1, depth):
+                _, PV = moveSearchMax(board, dep, dep, float("-inf"), float("inf"), colorWhite,
+                                      gamephase, PV, True, set1=firstSet, set2=secondSet)
+
+            move = PV[0][0]
+            board.push(move)
+            gamephase = game_phase(board)
+
+            #print_fen(board.fen().split(' ', 1)[0])
+
+            if board.is_game_over():
+                handle_endgame(board, returnDict, outcomes, i)
+                break
+
+            PV = make_PV(depth)
+
+            for dep in range(1, depth):
+                _, PV = moveSearchMax(board, dep, dep, float("-inf"), float("inf"), not colorWhite,
+                                      gamephase, PV, True, set1=firstSet, set2=secondSet)
+
+            move = PV[0][0]
+            board.push(move)
+            gamephase = game_phase(board)
+
+            if board.is_game_over():
+                handle_endgame(board, returnDict, outcomes, i)
+                break
+
+        print(str(outcomes[0]) + "-" + str(outcomes[1]))
+    except Exception as ex:
+        print(ex)
+        raise ex
 
     print(str(i) + " done time: " + str(round(time.time() - t, 4)))
 
@@ -182,12 +256,7 @@ def main(to):
     elif to == "stocky":
         numGames = int(sys.argv[2])
         stockyElo = int(sys.argv[3])
-        if stockyElo < 800:
-            print("it's numGames then stockyElo")
-            return
-        #return_dict = []
 
-        #mainStocky(1, return_dict, depth, time.time(), stockyElo)
         manager = Manager()
         return_dict = manager.list()
 
@@ -198,7 +267,36 @@ def main(to):
         errA = []
 
         for i in range(numGames):
-            errA.append(pool.apply_async(mainStocky, args=(i, return_dict, depth, time.time(), stockyElo,)))
+            errA.append(pool.apply_async(
+                mainStocky, args=(i, return_dict, depth, time.time(), stockyElo,)))
+
+        for x in errA:
+            x.get()
+
+        pool.close()
+        pool.join()
+
+        results = sum(return_dict)
+        print(str(results[0]) + "-" + str(results[1]))
+
+    elif to == "self":
+        numGames = int(sys.argv[2])
+        set1 = sys.argv[3]
+        set2 = sys.argv[4]
+
+        manager = Manager()
+        return_dict = manager.list()
+
+        num_workers = mp.cpu_count()
+
+        pool = mp.Pool(num_workers)
+
+        errA = []
+
+        for i in range(numGames):
+            errA.append(pool.apply_async(
+                mainSelf, args=(i, return_dict, depth, time.time(),
+                                weight_sets[set1], weight_sets[set2],)))
 
         for x in errA:
             x.get()
@@ -237,8 +335,10 @@ if __name__ == '__main__':
             main("terminal")
         elif sys.argv[1] == 'stocky':
             main("stocky")
+        elif sys.argv[1] == 'self':
+            main("stocky")
         else:
-            print("Usage: python engine.py terminal")
-            raise Exception("Usage: python engine.py terminal")
+            print("Usage: python engine.py ___")
+            raise Exception("Usage: python engine.py ___")
     else:
         main("xboard")

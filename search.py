@@ -1,11 +1,12 @@
 from quiescence import *
 from utilities import make_PV
 import globs
+from globs import traditional
 
-def moveSearchMax(board, cur_level, depth, lowest, highest, colorWhite, gamephase, PV, searchPV):
+def moveSearchMax(board, cur_level, depth, lowest, highest, colorWhite, gamephase, PV, searchPV, set1=traditional, set2=traditional):
 
     if cur_level == 0 or board.is_game_over() or board.is_stalemate():
-        return evalPos(board, colorWhite, gamephase), PV
+        return evalPos(board, colorWhite, gamephase, set1, set2), PV
 
     moves = board.legal_moves
     minEval = float("-inf")
@@ -25,7 +26,7 @@ def moveSearchMax(board, cur_level, depth, lowest, highest, colorWhite, gamephas
                 evaluation = 1000000 + cur_level if colorWhite else -1000000 - cur_level
 
         else:
-            evaluation, PV = moveSearchMin(board, cur_level - 1, depth, lo, hi, colorWhite, gamephase, PV, True)
+            evaluation, PV = moveSearchMin(board, cur_level - 1, depth, lo, hi, colorWhite, gamephase, PV, True, set1=set1, set2=set2)
 
         board.pop()
 
@@ -51,7 +52,7 @@ def moveSearchMax(board, cur_level, depth, lowest, highest, colorWhite, gamephas
                 evaluation = 1000000 + cur_level if colorWhite else -1000000 - cur_level
 
         else:
-            evaluation, PV = moveSearchMin(board, cur_level - 1, depth, lo, hi, colorWhite, gamephase, PV, False)
+            evaluation, PV = moveSearchMin(board, cur_level - 1, depth, lo, hi, colorWhite, gamephase, PV, False, set1=set1, set2=set2)
 
         board.pop()
 
@@ -69,10 +70,10 @@ def moveSearchMax(board, cur_level, depth, lowest, highest, colorWhite, gamephas
 
     return minEval, PV
 
-def moveSearchMin(board, cur_level, depth, lowest, highest, colorWhite, gamephase, PV, searchPV):
+def moveSearchMin(board, cur_level, depth, lowest, highest, colorWhite, gamephase, PV, searchPV, set1=traditional, set2=traditional):
 
     if cur_level == 0 or board.is_game_over() or board.is_stalemate():
-        return evalPos(board, colorWhite, gamephase), PV
+        return evalPos(board, colorWhite, gamephase, set1, set2), PV
 
     moves = board.legal_moves
     maxEval = float("inf")
@@ -92,7 +93,7 @@ def moveSearchMin(board, cur_level, depth, lowest, highest, colorWhite, gamephas
                 evaluation = 1000000 + cur_level if colorWhite else -1000000 - cur_level
 
         else:
-            evaluation, PV = moveSearchMax(board, cur_level - 1, depth, lo, hi, colorWhite, gamephase, PV, True)
+            evaluation, PV = moveSearchMax(board, cur_level - 1, depth, lo, hi, colorWhite, gamephase, PV, True, set1=set1, set2=set2)
         board.pop()
 
         maxEval = min(evaluation, maxEval)
@@ -118,7 +119,7 @@ def moveSearchMin(board, cur_level, depth, lowest, highest, colorWhite, gamephas
                 evaluation = 1000000 + cur_level if colorWhite else -1000000 - cur_level
 
         else:
-            evaluation, PV = moveSearchMax(board, cur_level - 1, depth, lo, hi, colorWhite, gamephase, PV, False)
+            evaluation, PV = moveSearchMax(board, cur_level - 1, depth, lo, hi, colorWhite, gamephase, PV, False, set1=set1, set2=set2)
         board.pop()
 
         maxEval = min(evaluation, maxEval)

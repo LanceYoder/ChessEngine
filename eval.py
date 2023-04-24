@@ -1,32 +1,33 @@
 import chess
 import numpy as np
-
-from utilities import pieceToScore
 from piece_maps import pms
 
-def evalPos(board, colorWhite, gamephase):
+def evalPos(board, colorWhite, gamephase, set1, set2):
 
     evaluation = 0
 
     # randomization so it doesn't just play rook moves when stuck
     # this shouldn't be necessary if my eval is good
     # but it might help make things interesting
-    evaluation += np.random.rand()
+    evaluation += np.random.rand() * 2 - 1
 
     # mobility
-    #evaluation -= board.legal_moves.count() / 6
+    evaluation -= board.legal_moves.count() / 6
 
     # bishop pair
-    #if len(board.pieces(chess.BISHOP, not board.turn)) == 2:
-    #    evaluation += 50
+    if len(board.pieces(chess.BISHOP, not board.turn)) == 2:
+        evaluation += 50
 
     pieces = board.piece_map()
     for p in pieces:
         piece_type = str(pieces[p])
         # piece weights
-        evaluation += pieceToScore(piece_type)
+        if piece_type.isupper():
+            evaluation += set1[piece_type]
+        else:
+            evaluation += set2[piece_type]
         # piece-square evaluation
-        #evaluation += pms(piece_type, p, gamephase)
+        evaluation += pms(piece_type, p, gamephase)
 
     if board.is_stalemate():
         if board.turn:
@@ -39,6 +40,7 @@ def evalPos(board, colorWhite, gamephase):
 # return an int indicating game phase
 # 0-100, 0 being opening, 100 being endgame
 def game_phase(board):
+    return 0
     gamePhase = 0
     pieces = board.piece_map()
     gamePhase += (32 - len(pieces)) * 3

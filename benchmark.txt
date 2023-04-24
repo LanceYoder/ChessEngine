@@ -1,5 +1,5 @@
 Benchmarking results:
-
+#################################################
 2/24/2023
 vs. Stockfish depth 10 ELO=1000
 Results: 20.0-36.0 (in favor of lancechess)
@@ -69,6 +69,7 @@ Results: 17.0-23.0
 Ratio: 1.0-1.11
 Alpha-beta pruning, search to depth 4, standard piece weights, 1 piece map set
 git commit 720d2d2
+#################################################
 
 4/19
 stockfish elo 1560
@@ -80,7 +81,7 @@ git commit 42427f5
 4/19
 stockfish elo 1300
 results: 7.5-32.5
-ratio: 1-4.33
+ratio: 1-4.33 REDOOOOOO
 final version, no parameter optimization
 git commit 42427f5
 
@@ -102,4 +103,89 @@ git commit 42427f5
 stockfish elo 1300
 results: 19.5-20.5
 ratio: 1-1.05
+just original piece weights and randomizer
+
+4/20
+stockfish elo 1150
+results: 14.0-26.0
+ratio: 1-1.86
 just original piece weights
+
+4/22
+stockfish elo 1500
+results: 21.0-19.0
+ratio: 1-0.904
+just original piece weights
+
+4/22
+stockfish elo 1430
+results: 21.5-18.5
+ratio: 1-0.86
+just original piece weights
+
+4/22
+stockfish elo 1200
+results: 116.0-4.0
+ratio: 1-0.026
+just original piece weights, search to depth 2
+
+4/22
+stockfish elo 1000
+results: 116.0-4.0
+ratio: 1-0.081
+just original piece weights, search to depth 2
+
+4/22
+stockfish elo 800
+results: 39.0-1.0
+ratio: 1-0.026
+just original piece weights, search to depth 2
+
+4/22
+stockfish elo 600
+results: 40.0-0.0
+ratio: 1-0.081
+just original piece weights, search to depth 2
+
+4/22
+stockfish elo 1400
+results: 17.5-22.5
+ratio: 1-1.29
+piece weights and bishops and mobility
+
+4/22
+stockfish elo 1500
+results: 21.0-19.0
+ratio: 1-0.905
+piece weights and bishops and mobility
+
+4/23
+stockfish elo 1450
+results: 20.0-20.0
+ratio: 1-1
+piece weights and bishops and mobility
+
+4/24
+stockfish elo 1700
+results: 25.5-14.5
+ratio: 1-0.57
+piece weights and bishops and mobility and static pst
+
+4/24
+stockfish elo 1500
+results: 13.0-27.0
+ratio: 1-2.08
+piece weights and bishops and mobility and static pst
+
+4/24
+started 3:25 pm to approx 4:30pm
+stockfish elo 1600
+results: 22.0-18.0
+ratio: 1-0.82
+piece weights and bishops and mobility and static pst
+
+4/24
+stockfish elo 1620
+results: 0.0-0.0
+ratio: 1-1
+piece weights and bishops and mobility and static pst
