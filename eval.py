@@ -1,6 +1,7 @@
 import chess
 import numpy as np
 from piece_maps import pst
+from globs import traditional, michniewski, kaufman, fruit, alphazero
 
 def evalPos(board, colorWhite, gamephase, set1, set2):
 
@@ -49,12 +50,17 @@ def game_phase(board):
     if not board.has_castling_rights(chess.BLACK):
         gamePhase += 5
 
-    queens = len(board.pieces(chess.QUEEN, chess.WHITE)) + len(board.pieces(chess.QUEEN, chess.BLACK))
-    rooks = len(board.pieces(chess.ROOK, chess.WHITE)) + len(board.pieces(chess.ROOK, chess.BLACK))
-    bishops = len(board.pieces(chess.BISHOP, chess.WHITE)) + len(board.pieces(chess.BISHOP, chess.BLACK))
-    knights = len(board.pieces(chess.KNIGHT, chess.WHITE)) + len(board.pieces(chess.KNIGHT, chess.BLACK))
+    queens = len(board.pieces(chess.QUEEN, chess.WHITE)) + \
+             len(board.pieces(chess.QUEEN, chess.BLACK))
+    rooks = len(board.pieces(chess.ROOK, chess.WHITE)) + \
+            len(board.pieces(chess.ROOK, chess.BLACK))
+    bishops = len(board.pieces(chess.BISHOP, chess.WHITE)) + \
+              len(board.pieces(chess.BISHOP, chess.BLACK))
+    knights = len(board.pieces(chess.KNIGHT, chess.WHITE)) + \
+              len(board.pieces(chess.KNIGHT, chess.BLACK))
     minors = rooks + bishops + knights
-    pawns = len(board.pieces(chess.PAWN, chess.WHITE)) + len(board.pieces(chess.PAWN, chess.BLACK))
+    pawns = len(board.pieces(chess.PAWN, chess.WHITE)) + \
+            len(board.pieces(chess.PAWN, chess.BLACK))
 
     gamePhase += (2 - queens) * 12
     gamePhase += (12 - minors) * 4

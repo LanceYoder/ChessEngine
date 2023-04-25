@@ -1,16 +1,10 @@
 from eval import *
 
-# quiesence should maybe be phase dependent:
-# opening and ending, check ALL captures
-# middle game, check only same square captures
-# check checks for both? to what depth?
-def quiescenceMax(board, depth, lowest, highest, colorWhite, gamephase):
+def qMax(board, depth, alpha, beta, colorWhite, gamephase, set1, set2):
     if depth == 0:
-        return evalPos(board, colorWhite, gamephase)
+        return evalPos(board, colorWhite, gamephase, set1, set2)
     moves = board.legal_moves
     minEval = float("-inf")
-    lo = lowest
-    hi = highest
 
     for i, move in enumerate(moves):
         if not board.is_check():
@@ -18,30 +12,30 @@ def quiescenceMax(board, depth, lowest, highest, colorWhite, gamephase):
 
         board.push(move)
         if board.is_game_over():
-            evaluation = evalPos(board, colorWhite, gamephase)
+            evaluation = evalPos(board, colorWhite,
+                                 gamephase, set1, set2)
             board.pop()
             return evaluation
 
-        evaluation = quiescenceMin(board, depth - 1, lo, hi, colorWhite, gamephase)
+        evaluation = qMin(board, depth - 1, alpha, beta,
+                          colorWhite, gamephase, set1, set2)
         board.pop()
 
         minEval = max(evaluation, minEval)
 
-        if minEval >= hi:
+        if minEval >= beta:
             return minEval
-        lo = max(lo, minEval)
+        alpha = max(alpha, minEval)
 
     return minEval
 
-def quiescenceMin(board, depth, lowest, highest, colorWhite, gamephase):
+def qMin(board, depth, alpha, beta, colorWhite, gamephase, set1, set2):
 
     if depth == 0:
-        return evalPos(board, colorWhite, gamephase)
+        return evalPos(board, colorWhite, gamephase, set1, set2)
 
     moves = board.legal_moves
     maxEval = float("inf")
-    lo = lowest
-    hi = highest
 
     for i, move in enumerate(moves):
         if not board.is_check():
@@ -49,17 +43,19 @@ def quiescenceMin(board, depth, lowest, highest, colorWhite, gamephase):
 
         board.push(move)
         if board.is_game_over():
-            evaluation = evalPos(board, colorWhite, gamephase)
+            evaluation = evalPos(board, colorWhite,
+                                 gamephase, set1, set2)
             board.pop()
             return evaluation
 
-        evaluation = quiescenceMax(board, depth - 1, lo, hi, colorWhite, gamephase)
+        evaluation = qMax(board, depth - 1, alpha, beta,
+                          colorWhite, gamephase, set1, set2)
         board.pop()
 
         maxEval = min(evaluation, maxEval)
 
-        if maxEval <= lo:
+        if maxEval <= alpha:
             return maxEval
-        hi = min(hi, maxEval)
+        beta = min(beta, maxEval)
 
     return maxEval

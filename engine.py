@@ -20,9 +20,9 @@ from search import *
 from stocky import *
 
 #############################
-# weird thing to make it work
+# makes terminal work
 #############################
-if sys.stdout.encoding is None or sys.stdout.encoding == 'ANSI_X3.4-1968':
+if sys.stdout.encoding is None or sys.stdout.encoding=='ANSI_X3.4-1968':
     utf8_writer = codecs.getwriter('UTF-8')
     if sys.version_info.major < 3:
         sys.stdout = utf8_writer(sys.stdout, errors='replace')
@@ -48,10 +48,11 @@ def processInput(board, depth):
 
             PV = make_PV(depth)
             globs.pvLength = depth
-
             for i in range(1, depth):
-                evaluation, PV = moveSearchMax(board, i, i, float("-inf"), float("inf"),
-                                               colorWhite, gamephase, PV, True)
+                evaluation, PV = moveSearchMax(
+                    board, i, i,
+                    float("-inf"), float("inf"),
+                    colorWhite, gamephase, PV, True)
 
             move = PV[0][0]
             board.push(move)
@@ -95,7 +96,8 @@ def mainTerminal(board, board_fen, depth):
         globs.pvLength = depth
 
         for i in range(1, depth):
-            _, PV = moveSearchMax(board, i, i, float("-inf"), float("inf"),
+            _, PV = moveSearchMax(board, i, i,
+                                  float("-inf"), float("inf"),
                                   colorWhite, gamephase, PV, True)
 
         move = PV[0][0]
@@ -143,10 +145,11 @@ def mainStocky(i, returnDict, depth, t, stockyElo):
             PV = make_PV(depth)
 
             for dep in range(1, depth):
-                _, PV = moveSearchMax(board, dep, dep, float("-inf"), float("inf"),
+                _, PV = moveSearchMax(board, depth, depth,
+                                      float("-inf"), float("inf"),
                                       colorWhite, gamephase, PV, True)
 
-            move = PV#[0][0]
+            move = PV[0][0]
             board.push(move)
             gamephase = game_phase(board)
 
@@ -187,22 +190,26 @@ def mainSelf(i, returnDict, depth, t, set1, set2):
             PV = make_PV(depth)
 
             for dep in range(1, depth):
-                _, PV = moveSearchMax(board, dep, dep, float("-inf"), float("inf"),
-                                      True, gamephase, PV, True, set1=set2, set2=set1)
+                _, PV = moveSearchMax(board, dep, dep,
+                                      float("-inf"), float("inf"),
+                                      True, gamephase, PV, True,
+                                      set1=set1, set2=set2)
 
             move = PV[0][0]
             board.push(move)
             gamephase = game_phase(board)
 
             colorWhite = False
-            firstSet = set2
-            secondSet = set1
-            print("set " + str(set2) + " playing as white, set " + str(set1) + " as black on Thread " + str(i))
-        else:
             firstSet = set1
             secondSet = set2
+            print("set " + str(firstSet) + " playing as white, set " +
+                  str(secondSet) + " as black on Thread " + str(i))
+        else:
             colorWhite = True
-            print("set " + str(set1) + " playing as white, set " + str(set2) + " as black on Thread " + str(i))
+            firstSet = set2
+            secondSet = set1
+            print("set " + str(firstSet) + " playing as white, set " +
+                  str(secondSet) + " as black on Thread " + str(i))
 
         k = 0
         while True:
@@ -213,14 +220,14 @@ def mainSelf(i, returnDict, depth, t, set1, set2):
             PV = make_PV(depth)
 
             for dep in range(1, depth):
-                _, PV = moveSearchMax(board, dep, dep, float("-inf"), float("inf"), colorWhite,
-                                      gamephase, PV, True, set1=firstSet, set2=secondSet)
+                _, PV = moveSearchMax(board, dep, dep,
+                                      float("-inf"), float("inf"),
+                                      colorWhite, gamephase, PV, True,
+                                      set1=firstSet, set2=secondSet)
 
             move = PV[0][0]
             board.push(move)
             gamephase = game_phase(board)
-
-            #print_fen(board.fen().split(' ', 1)[0])
 
             if board.is_game_over():
                 print("moves: ", k)
@@ -230,8 +237,11 @@ def mainSelf(i, returnDict, depth, t, set1, set2):
             PV = make_PV(depth)
 
             for dep in range(1, depth):
-                _, PV = moveSearchMax(board, dep, dep, float("-inf"), float("inf"), not colorWhite,
-                                      gamephase, PV, True, set1=firstSet, set2=secondSet)
+                _, PV = moveSearchMax(
+                    board, dep, dep,
+                    float("-inf"), float("inf"),
+                    not colorWhite,  gamephase, PV,
+                    True, set1=firstSet, set2=secondSet)
 
             move = PV[0][0]
             board.push(move)
@@ -258,34 +268,25 @@ def main(to):
         mainTerminal(board, board_fen, depth)
 
     elif to == "stocky":
-        numGames = 2#int(sys.argv[2])
-        stockyElo = 1500#int(sys.argv[3])
+        numGames = int(sys.argv[2])
+        stockyElo = int(sys.argv[3])
 
-        #manager = Manager()
-        #return_dict = manager.list()
+        manager = Manager()
+        return_dict = manager.list()
 
-        #num_workers = mp.cpu_count()
+        num_workers = mp.cpu_count()
 
-        #pool = mp.Pool(num_workers)
+        pool = mp.Pool(num_workers)
 
-        errA = []
+        for i in range(numGames):
+            pool.apply_async(
+                mainStocky, args=(i, return_dict, depth,
+                                  time.time(), stockyElo,))
 
+        pool.close()
+        pool.join()
 
-        #for i in range(numGames):
-        #    errA.append(pool.apply_async(
-        #        mainStocky, args=(i, return_dict, depth, time.time(), stockyElo,)))
-
-        ret = []
-        for _ in range(numGames):
-            mainStocky(1, ret, depth, time.time(), stockyElo)
-
-        for x in errA:
-            x.get()
-
-        #pool.close()
-        #pool.join()
-
-        results = sum(ret)
+        results = sum(return_dict)
         print(str(results[0]) + "-" + str(results[1]))
 
     elif to == "self":
@@ -300,15 +301,10 @@ def main(to):
 
         pool = mp.Pool(num_workers)
 
-        errA = []
-
         for i in range(numGames):
-            errA.append(pool.apply_async(
+            pool.apply_async(
                 mainSelf, args=(i, return_dict, depth, time.time(),
-                                weight_sets[set1], weight_sets[set2],)))
-
-        for x in errA:
-            x.get()
+                                weight_sets[set1], weight_sets[set2],))
 
         pool.close()
         pool.join()
@@ -329,10 +325,11 @@ def main(to):
         else:
             raise Exception("not protover 2")
 
-        sys.stdout.write("feature done=0 reuse=0 time=0 sigint=0" + "\n")
+        sys.stdout.write("feature done=0 reuse=0 time=0 sigint=0"+"\n")
         sys.stdout.write("feature done=1" + "\n")
         sys.stdout.flush()
 
+        print("here1")
         processInput(board, depth)
 
     return

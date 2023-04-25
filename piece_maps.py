@@ -7,27 +7,33 @@ def pst(piece_type, sqr, gamephase):
     if piece_type == 'P':
         return mg * pawn_map_mg(sqr) + eg * pawn_map_eg(sqr)
     elif piece_type == 'p':
-        return (-1) * mg * pawn_map_mg(63 - sqrBlack) + (-1) * eg * pawn_map_eg(63 - sqrBlack)
+        return (-1) * mg * pawn_map_mg(63 - sqrBlack) + \
+               (-1) * eg * pawn_map_eg(63 - sqrBlack)
     elif piece_type == 'N':
         return mg * knight_map_mg(sqr) + eg * knight_map_eg(sqr)
     elif piece_type == 'n':
-        return (-1) * mg * knight_map_mg(63 - sqrBlack) + (-1) * eg * knight_map_eg(63 - sqrBlack)
+        return (-1) * mg * knight_map_mg(63 - sqrBlack) + \
+               (-1) * eg * knight_map_eg(63 - sqrBlack)
     elif piece_type == 'B':
         return mg * bishop_map_mg(sqr) + eg * bishop_map_eg(sqr)
     elif piece_type == 'b':
-        return (-1) * mg * bishop_map_mg(63 - sqrBlack) + (-1) * eg * bishop_map_eg(63 - sqrBlack)
+        return (-1) * mg * bishop_map_mg(63 - sqrBlack) + \
+               (-1) * eg * bishop_map_eg(63 - sqrBlack)
     elif piece_type == 'R':
         return mg * rook_map_mg(sqr) + eg * rook_map_eg(sqr)
     elif piece_type == 'r':
-        return (-1) * mg * rook_map_mg(63 - sqrBlack) + (-1) * eg * rook_map_eg(63 - sqrBlack)
+        return (-1) * mg * rook_map_mg(63 - sqrBlack) + \
+               (-1) * eg * rook_map_eg(63 - sqrBlack)
     elif piece_type == 'Q':
         return mg * queen_map_mg(sqr) + eg * queen_map_eg(sqr)
     elif piece_type == 'q':
-        return (-1) * mg * queen_map_mg(63 - sqrBlack) + (-1) * eg * queen_map_eg(63 - sqrBlack)
+        return (-1) * mg * queen_map_mg(63 - sqrBlack) + \
+               (-1) * eg * queen_map_eg(63 - sqrBlack)
     elif piece_type == 'K':
         return mg * king_map_mg(sqr) + eg * king_map_eg(sqr)
     elif piece_type == 'k':
-        return (-1) * mg * king_map_mg(63 - sqrBlack) + (-1) * eg * king_map_eg(63 - sqrBlack)
+        return (-1) * mg * king_map_mg(63 - sqrBlack) + \
+               (-1) * eg * king_map_eg(63 - sqrBlack)
 
 # mid-game callers
 def pawn_map_mg(sqr):

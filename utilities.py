@@ -18,15 +18,20 @@ def get_stats(board):
     # structure: queen#, rook#, bishop#, knight#, pawn#
     string = ""
 
-    string += str(len(board.pieces(chess.QUEEN, chess.BLACK)) - len(board.pieces(chess.QUEEN, chess.WHITE)))
+    string += str(len(board.pieces(chess.QUEEN, chess.BLACK)) -
+                  len(board.pieces(chess.QUEEN, chess.WHITE)))
     string += ';'
-    string += str(len(board.pieces(chess.ROOK, chess.BLACK)) - len(board.pieces(chess.ROOK, chess.WHITE)))
+    string += str(len(board.pieces(chess.ROOK, chess.BLACK)) -
+                  len(board.pieces(chess.ROOK, chess.WHITE)))
     string += ';'
-    string += str(len(board.pieces(chess.BISHOP, chess.BLACK)) - len(board.pieces(chess.BISHOP, chess.WHITE)))
+    string += str(len(board.pieces(chess.BISHOP, chess.BLACK)) -
+                  len(board.pieces(chess.BISHOP, chess.WHITE)))
     string += ';'
-    string += str(len(board.pieces(chess.KNIGHT, chess.BLACK)) - len(board.pieces(chess.KNIGHT, chess.WHITE)))
+    string += str(len(board.pieces(chess.KNIGHT, chess.BLACK)) -
+                  len(board.pieces(chess.KNIGHT, chess.WHITE)))
     string += ';'
-    string += str(len(board.pieces(chess.PAWN, chess.BLACK)) - len(board.pieces(chess.PAWN, chess.WHITE)))
+    string += str(len(board.pieces(chess.PAWN, chess.BLACK)) -
+                  len(board.pieces(chess.PAWN, chess.WHITE)))
     string += ';'
     return string
 
@@ -89,7 +94,5 @@ def print_fen(fen):
 
 def setup():
     board = chess.Board()
-
     board_fen = board.fen().split(' ', 1)[0]
-
     return board, board_fen

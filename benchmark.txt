@@ -199,30 +199,85 @@ piece weights and bishops and mobility and static pst
 
 
 
-timing and calls to evalPos() with a/b, PV
-1 game
-calls - 1,866,393
-time 435.59 seconds
-3 games
-calls - 8,539,330
-time 2168.388 seconds
-1 game
-calls - 1,235,869
-time 342.92 seconds
-total:
-calls: 2,328,318 calls / game
-time: 589 seconds / game
-time/call: 2.5297 x 10^-4 seconds
+timing and calls to evalPos()
+2 runs
+calls 7,746,623
+time 1863.534
+moves 64 + 82
+2 runs
+calls 8,883,648
+time 2433.788
+moves 128 + 15
+2 runs
+calls 3,749,230
+time 1064.112
+moves 32 + 65
+total calls 20379501
+total time 5360
+total moves 386
+time/calls 2.630 x 10^-4
+calls/move 52796
+time/move 13.88
 
-timing and calls to evalPos() with a/b
-1 game
-calls - 2668466
-time - 640.602
+2 runs
+calls
+time
+moves
+2 runs
+calls
+time
+moves
+2 runs
+calls
+time
+moves
+total calls
+total time
+total moves
+time/calls
+calls/move
+time/move
 
-timing and calls to evalPos() with a/b, PV and only piece weights
-2 games
-calls - 3510403
-time - 393.684
-1 game
-calls - 4321746
-time - 539.361
+
+timing and calls to evalPos() a/b
+2 runs
+calls 11,462,172
+time 2246.403
+moves 46 + 54
+2 runs
+calls 8173330
+time 1615.222
+moves 105 + 59
+2 runs
+calls 5053561
+time 1240.887
+moves 53 + 39
+total calls 24689093
+total time 5101
+total moves 356
+time/calls 2.066 x 10^-4
+calls/move 69351
+time/move = 14.34
+
+2 runs
+calls
+time
+moves
+2 runs
+calls
+time
+moves
+2 runs
+calls
+time
+moves
+
+timing and calls to evalPos() minimax
+
+timing and calls to evalPos() only piece weights
+
+timing and calls to evalPos() bishop/mob
+
+timing and calls to evalPos() static gamephase
+
+timing and calls to evalPos() interpolating tables
