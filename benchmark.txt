@@ -85,6 +85,13 @@ ratio: 1-4.33 REDOOOOOO
 final version, no parameter optimization
 git commit 42427f5
 
+4/24
+stockfish elo 1750
+results: 21.0-19.0
+ratio: 1-0.904
+final version, no parameter optimization
+git commit 42427f5
+
 4/19
 stockfish elo 1700
 results: 20.0-20.0
