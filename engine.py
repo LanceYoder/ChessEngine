@@ -292,6 +292,9 @@ def main(to):
         pool = mp.Pool(num_workers)
 
         errA = []
+        print(str(weight_sets[set1]))
+
+        print(str(weight_sets[set2]))
 
         for i in range(numGames):
             errA.append(pool.apply_async(
