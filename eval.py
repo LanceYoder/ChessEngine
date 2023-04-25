@@ -1,6 +1,6 @@
 import chess
 import numpy as np
-from piece_maps import pms
+from piece_maps import pst
 
 def evalPos(board, colorWhite, gamephase, set1, set2):
 
@@ -19,28 +19,27 @@ def evalPos(board, colorWhite, gamephase, set1, set2):
         evaluation += 50
 
     pieces = board.piece_map()
-    for p in pieces:
-        piece_type = str(pieces[p])
+    for sqr in pieces:
+        piece_type = str(pieces[sqr])
         # piece weights
         if piece_type.isupper():
             evaluation += set1[piece_type]
         else:
             evaluation += set2[piece_type]
         # piece-square evaluation
-        evaluation += pms(piece_type, p, gamephase)
+        evaluation += pst(piece_type, sqr, gamephase)
 
     if board.is_stalemate():
-        if board.turn:
-            return -3000 if evaluation > 0 else 100
+        if evaluation > 0 ^ colorWhite:
+            return 1000
         else:
-            return -3000 if evaluation < 0 else 100
+            return -1000
 
     return evaluation if colorWhite else -1 * evaluation
 
 # return an int indicating game phase
 # 0-100, 0 being opening, 100 being endgame
 def game_phase(board):
-    return 0
     gamePhase = 0
     pieces = board.piece_map()
     gamePhase += (32 - len(pieces)) * 3

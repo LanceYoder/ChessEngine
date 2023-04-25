@@ -336,7 +336,7 @@ if __name__ == '__main__':
         elif sys.argv[1] == 'stocky':
             main("stocky")
         elif sys.argv[1] == 'self':
-            main("stocky")
+            main("self")
         else:
             print("Usage: python engine.py ___")
             raise Exception("Usage: python engine.py ___")

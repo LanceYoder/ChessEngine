@@ -186,6 +186,6 @@ piece weights and bishops and mobility and static pst
 
 4/24
 stockfish elo 1620
-results: 0.0-0.0
-ratio: 1-1
+results: 22.5-17.5
+ratio: 1-0.78
 piece weights and bishops and mobility and static pst
