@@ -195,12 +195,12 @@ def mainSelf(i, returnDict, depth, t, set1, set2):
             colorWhite = False
             firstSet = set2
             secondSet = set1
-            print("stockfish playing as white on Thread " + str(i))
+            print("set " + set2 + " playing as white, set " + set1 + " as black on Thread " + str(i))
         else:
             firstSet = set1
             secondSet = set2
             colorWhite = True
-            print("stockfish playing as black on Thread " + str(i))
+            print("set " + set1 + " playing as white, set " + set2 + " as black on Thread " + str(i))
 
         k = 0
         while True:
