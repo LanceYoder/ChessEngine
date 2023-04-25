@@ -146,11 +146,12 @@ def mainStocky(i, returnDict, depth, t, stockyElo):
                 _, PV = moveSearchMax(board, dep, dep, float("-inf"), float("inf"),
                                       colorWhite, gamephase, PV, True)
 
-            move = PV[0][0]
+            move = PV#[0][0]
             board.push(move)
             gamephase = game_phase(board)
 
             if board.is_game_over():
+                print("moves: ", k)
                 handle_endgame(board, returnDict, outcomes, i)
                 break
 
@@ -161,6 +162,7 @@ def mainStocky(i, returnDict, depth, t, stockyElo):
             board.push(move)
 
             if board.is_game_over():
+                print("moves: ", k)
                 handle_endgame(board, returnDict, outcomes, i)
                 break
 
@@ -221,6 +223,7 @@ def mainSelf(i, returnDict, depth, t, set1, set2):
             #print_fen(board.fen().split(' ', 1)[0])
 
             if board.is_game_over():
+                print("moves: ", k)
                 handle_endgame(board, returnDict, outcomes, i)
                 break
 
@@ -235,6 +238,7 @@ def mainSelf(i, returnDict, depth, t, set1, set2):
             gamephase = game_phase(board)
 
             if board.is_game_over():
+                print("moves: ", k)
                 handle_endgame(board, returnDict, outcomes, i)
                 break
 
@@ -254,30 +258,34 @@ def main(to):
         mainTerminal(board, board_fen, depth)
 
     elif to == "stocky":
-        numGames = int(sys.argv[2])
-        stockyElo = int(sys.argv[3])
+        numGames = 2#int(sys.argv[2])
+        stockyElo = 1500#int(sys.argv[3])
 
-        manager = Manager()
-        return_dict = manager.list()
+        #manager = Manager()
+        #return_dict = manager.list()
 
-        num_workers = mp.cpu_count()
+        #num_workers = mp.cpu_count()
 
-        pool = mp.Pool(num_workers)
+        #pool = mp.Pool(num_workers)
 
         errA = []
 
 
-        for i in range(numGames):
-            errA.append(pool.apply_async(
-                mainStocky, args=(i, return_dict, depth, time.time(), stockyElo,)))
+        #for i in range(numGames):
+        #    errA.append(pool.apply_async(
+        #        mainStocky, args=(i, return_dict, depth, time.time(), stockyElo,)))
+
+        ret = []
+        for _ in range(numGames):
+            mainStocky(1, ret, depth, time.time(), stockyElo)
 
         for x in errA:
             x.get()
 
-        pool.close()
-        pool.join()
+        #pool.close()
+        #pool.join()
 
-        results = sum(return_dict)
+        results = sum(ret)
         print(str(results[0]) + "-" + str(results[1]))
 
     elif to == "self":

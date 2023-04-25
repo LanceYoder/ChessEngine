@@ -12,10 +12,11 @@ def moveSearchMax(board, cur_level, depth, lowest, highest, colorWhite, gamephas
     minEval = float("-inf")
     lo = lowest
     hi = highest
+    bestMove = None
 
     # try pv
-    move = PV[depth - cur_level][0]
-    if move is not None and searchPV and board.is_legal(move):
+    #move = PV[depth - cur_level][0]
+    if False:#move is not None and searchPV and board.is_legal(move):
 
         board.push(move)
 
@@ -56,19 +57,22 @@ def moveSearchMax(board, cur_level, depth, lowest, highest, colorWhite, gamephas
 
         board.pop()
 
-        minEval = max(evaluation, minEval)
+        #minEval = max(evaluation, minEval)
+        if evaluation > minEval:
+            minEval = evaluation
+            bestMove = move
 
-        if minEval >= hi:
-            return minEval, PV
+        #if minEval >= hi:
+        #    return minEval, PV
 
-        lo = max(minEval, lo)
+        #lo = max(minEval, lo)
 
-        if lo > PV[depth - cur_level][1]:
-            if 1 == cur_level:
-                PV = make_PV(globs.pvLength)
-            PV[depth - cur_level] = (move, lo)
+        #if lo > PV[depth - cur_level][1]:
+        #    if 1 == cur_level:
+        #        PV = make_PV(globs.pvLength)
+        #    PV[depth - cur_level] = (move, lo)
 
-    return minEval, PV
+    return minEval, bestMove#PV
 
 def moveSearchMin(board, cur_level, depth, lowest, highest, colorWhite, gamephase, PV, searchPV, set1=traditional, set2=traditional):
 
@@ -79,10 +83,11 @@ def moveSearchMin(board, cur_level, depth, lowest, highest, colorWhite, gamephas
     maxEval = float("inf")
     lo = lowest
     hi = highest
+    bestMove = None
 
     # try PV
-    move = PV[depth - cur_level][0]
-    if move is not None and searchPV and board.is_legal(move):
+    #move = PV[depth - cur_level][0]
+    if False:#move is not None and searchPV and board.is_legal(move):
 
         board.push(move)
 
@@ -122,16 +127,19 @@ def moveSearchMin(board, cur_level, depth, lowest, highest, colorWhite, gamephas
             evaluation, PV = moveSearchMax(board, cur_level - 1, depth, lo, hi, colorWhite, gamephase, PV, False, set1=set1, set2=set2)
         board.pop()
 
-        maxEval = min(evaluation, maxEval)
+        #maxEval = min(evaluation, maxEval)
+        if evaluation < maxEval:
+            maxEval = evaluation
+            bestMove = move
 
-        if maxEval <= lo:
-            return maxEval, PV
+        #if maxEval <= lo:
+        #    return maxEval, PV
 
-        hi = min(maxEval, hi)
+        #hi = min(maxEval, hi)
 
-        if hi < PV[depth - cur_level][1]:
-            if 1 == cur_level:
-                PV = make_PV(globs.pvLength)
-            PV[depth - cur_level] = (move, hi)
+        #if hi < PV[depth - cur_level][1]:
+        #    if 1 == cur_level:
+        #        PV = make_PV(globs.pvLength)
+        #    PV[depth - cur_level] = (move, hi)
 
-    return maxEval, PV
+    return maxEval, bestMove#PV
