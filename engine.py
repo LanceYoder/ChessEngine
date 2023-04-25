@@ -254,29 +254,28 @@ def main(to):
         mainTerminal(board, board_fen, depth)
 
     elif to == "stocky":
-        numGames = 3#int(sys.argv[2])
-        stockyElo = 1300#int(sys.argv[3])
+        numGames = int(sys.argv[2])
+        stockyElo = int(sys.argv[3])
 
-        #manager = Manager()
-        #return_dict = manager.list()
+        manager = Manager()
+        return_dict = manager.list()
 
-        #num_workers = mp.cpu_count()
+        num_workers = mp.cpu_count()
 
-        #pool = mp.Pool(num_workers)
+        pool = mp.Pool(num_workers)
 
         errA = []
-        i = 1
-        return_dict = []
-        #for i in range(numGames):
-        #    errA.append(pool.apply_async(
-        #        mainStocky, args=(i, return_dict, depth, time.time(), stockyElo,)))
-        for _ in range(numGames):
-            mainStocky(i, return_dict, depth, time.time(), stockyElo)
+
+
+        for i in range(numGames):
+            errA.append(pool.apply_async(
+                mainStocky, args=(i, return_dict, depth, time.time(), stockyElo,)))
+
         for x in errA:
             x.get()
 
-        #pool.close()
-        #pool.join()
+        pool.close()
+        pool.join()
 
         results = sum(return_dict)
         print(str(results[0]) + "-" + str(results[1]))
