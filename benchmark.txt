@@ -196,3 +196,33 @@ stockfish elo 1620
 results: 22.5-17.5
 ratio: 1-0.78
 piece weights and bishops and mobility and static pst
+
+
+
+timing and calls to evalPos() with a/b, PV
+1 game
+calls - 1,866,393
+time 435.59 seconds
+3 games
+calls - 8,539,330
+time 2168.388 seconds
+1 game
+calls - 1,235,869
+time 342.92 seconds
+total:
+calls: 2,328,318 calls / game
+time: 589 seconds / game
+time/call: 2.5297 x 10^-4 seconds
+
+timing and calls to evalPos() with a/b
+1 game
+calls - 2668466
+time - 640.602
+
+timing and calls to evalPos() with a/b, PV and only piece weights
+2 games
+calls - 3510403
+time - 393.684
+1 game
+calls - 4321746
+time - 539.361
