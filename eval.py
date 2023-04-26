@@ -1,7 +1,12 @@
 import chess
 import numpy as np
 from piece_maps import pst
-from globs import traditional, michniewski, kaufman, fruit, alphazero
+from globs import trad, mich, kauf, fruit, alpha
+import timeit
+
+
+
+
 
 def evalPos(board, colorWhite, gamephase, set1, set2):
 
@@ -23,10 +28,11 @@ def evalPos(board, colorWhite, gamephase, set1, set2):
     for sqr in pieces:
         piece_type = str(pieces[sqr])
         # piece weights
-        if piece_type.isupper():
-            evaluation += set1[piece_type]
-        else:
-            evaluation += set2[piece_type]
+        evaluation += trad[piece_type]
+        #if piece_type.isupper():
+        #    evaluation += set1[piece_type]
+        #else:
+        #    evaluation += set2[piece_type]
         # piece-square evaluation
         evaluation += pst(piece_type, sqr, gamephase)
 
@@ -69,3 +75,9 @@ def game_phase(board):
     gamePhase += board.fullmove_number / 2
 
     return gamePhase if gamePhase < 100 else 100
+
+#board = chess.Board()
+#board.push(chess.Move.from_uci('d2d4'))
+#board.push(chess.Move.from_uci('d7d5'))
+#board.push(chess.Move.from_uci('e2e4'))
+#print(timeit.timeit('evalPos(board, True, 15)', globals=globals(), number=10000))

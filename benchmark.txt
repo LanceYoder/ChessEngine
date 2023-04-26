@@ -82,28 +82,28 @@ git commit 42427f5
 stockfish elo 1300
 results: 7.5-32.5
 ratio: 1-4.33 REDOOOOOO
-final version, no parameter optimization
+final version
 git commit 42427f5
 
 4/24
 stockfish elo 1750
 results: 21.0-19.0
 ratio: 1-0.904
-final version, no parameter optimization
+final version
 git commit 42427f5
 
 4/19
 stockfish elo 1700
 results: 20.0-20.0
 ratio: 1-1
-final version, no parameter optimization
+final version
 git commit 42427f5
 
 4/19
 stockfish elo 1850
 results: 32.5-7.5
 ratio: 1-0.23
-final version, no parameter optimization
+final version
 git commit 42427f5
 
 4/20
@@ -196,6 +196,21 @@ stockfish elo 1620
 results: 22.5-17.5
 ratio: 1-0.78
 piece weights and bishops and mobility and static pst
+
+
+#######################################
+stockfish 1700 vs. alpha
+49.5-50.5
+stockfish 1700 vs. mich
+17.5-22.5
+stockfish 1700 vs. fruit
+20.5-19.5
+stockfish 1700 vs. kauf
+20.5-19.5
+
+
+
+#######################################
 
 
 

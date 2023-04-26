@@ -7,6 +7,7 @@
 
 import sys
 import codecs
+import cProfile
 #import time
 from multiprocessing import Manager, Process
 import multiprocessing as mp
@@ -30,7 +31,7 @@ if sys.stdout.encoding is None or sys.stdout.encoding=='ANSI_X3.4-1968':
         sys.stdout = utf8_writer(sys.stdout.buffer, errors='replace')
 #############################
 
-def processInput(board, depth):
+def mainXboard(board, depth):
     gamephase = 0
 
     colorWhite = False
@@ -145,7 +146,7 @@ def mainStocky(i, returnDict, depth, t, stockyElo):
             PV = make_PV(depth)
 
             for dep in range(1, depth):
-                _, PV = moveSearchMax(board, depth, depth,
+                _, PV = moveSearchMax(board, dep, dep,
                                       float("-inf"), float("inf"),
                                       colorWhite, gamephase, PV, True)
 
@@ -329,11 +330,9 @@ def main(to):
         sys.stdout.write("feature done=1" + "\n")
         sys.stdout.flush()
 
-        print("here1")
-        processInput(board, depth)
+        mainXboard(board, depth)
 
     return
-
 
 if __name__ == '__main__':
     if len(sys.argv) > 1:

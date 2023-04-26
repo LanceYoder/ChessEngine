@@ -7,7 +7,7 @@ def qMax(board, depth, alpha, beta, colorWhite, gamephase, set1, set2):
     minEval = float("-inf")
 
     for i, move in enumerate(moves):
-        if not board.is_check():
+        if not board.is_capture(move):
             continue
 
         board.push(move)
@@ -38,7 +38,7 @@ def qMin(board, depth, alpha, beta, colorWhite, gamephase, set1, set2):
     maxEval = float("inf")
 
     for i, move in enumerate(moves):
-        if not board.is_check():
+        if not board.is_capture(move):
             continue
 
         board.push(move)
